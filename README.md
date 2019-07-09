@@ -37,6 +37,12 @@ npm run dev
 npm run build
 ```
 
+## Testing
+Run the Cypress tests in Docker like this:  
+```bash
+docker-compose -f tests/docker/docker-compose.test.yml run cypress --rm
+```
+
 ## License
 
 See [LICENSE](LICENSE)
