@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - You can use `;` to search in Availability for more than one user
+- Updated boostrap-vue to rc25 - this should prevent modal from closing onMouseUp event
 
 ## [1.0.10] - 2019-02-04
 
