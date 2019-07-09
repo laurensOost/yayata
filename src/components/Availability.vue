@@ -81,7 +81,7 @@ div
 
       div(class='btn-toolbar justify-content-center')
         div(class='input-group input-group-sm mr-2')
-          b-form-input(:type='"text"' :placeholder='"Filter (eg. " + user.username + ")"' v-model="filterQuery")
+          b-form-input(:type='"text"' :placeholder='"Filter (eg. " + user.username + ")"' v-model="filterQuery" v-b-tooltip.top title="Tip: You can use ; to split search, like: tom;jan")
 
         div(class='btn-group btn-group-sm' role='group')
           b-dropdown(variant='outline-dark' size='sm' right :text='filterCountry ? filterCountry : "Country"')
@@ -196,12 +196,17 @@ export default {
         }
 
         if (this.filterQuery) {
-          let query = this.filterQuery.toLowerCase()
+          let query = this.filterQuery.toLowerCase().split(';').map(s => s.trim()).filter(s => s.length !== 0);
+
           users = users.filter(user => {
-            return (user.username.toLowerCase().indexOf(query) > -1)
-              || (user.display_label.toLowerCase().indexOf(query) > -1)
-              || (user.email.toLowerCase().indexOf(query) > -1)
-          })
+            for (let queryPart of query){
+              if ((user.username.toLowerCase().indexOf(queryPart) > -1)
+                || (user.display_label.toLowerCase().indexOf(queryPart) > -1)
+                || (user.email.toLowerCase().indexOf(queryPart) > -1))
+                return true
+              }
+            }
+          )
         }
 
         return users

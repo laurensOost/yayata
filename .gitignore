@@ -7,3 +7,4 @@ cypress.env.json
 cypress/videos/
 cypress/screenshots/
 cypress/.Trash-0/
+.idea/
