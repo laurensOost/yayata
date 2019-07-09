@@ -146,6 +146,16 @@ module.exports = (env, argv) => {
           }, {
             loader: 'css-loader'
           }]
+        },
+        {
+          test: /CHANGELOG\.md/,
+          use: {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]?[hash]',
+              // name: '[name].[ext]',
+            }
+          }
         }
       ]
     },

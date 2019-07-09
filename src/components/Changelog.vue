@@ -6,9 +6,9 @@ div
 </template>
 
 <script>
-import store from '../store'
 import Vue from 'vue'
 import VueMarkdown from 'vue-markdown'
+import changelogFile from '../../CHANGELOG.md'
 
 export default {
   name: 'changelog',
@@ -29,12 +29,12 @@ export default {
   created: function() {
     Vue.http({
       method: 'GET',
-      url: `https://api.github.com/repos/kalmanolah/yayata/contents/CHANGELOG.md?t=${(new Date().getTime())}`,
+      url: "/"+changelogFile,
       headers: {
         Accept: 'application/vnd.github.v3.full+json',
       },
     }).then((res) => {
-      this.changelogContent = atob(res.data.content)
+      this.changelogContent = res.data
     })
   }
 }
