@@ -100,7 +100,7 @@ div
         tr(v-for='user in users')
           td(class='cell')
             div(class='row justify-content-center')
-              ColleagueAvatarWidget(class='col-auto' :user='user' size='30')
+              ColleagueAvatarWidget(class='col' :user='user' size='40')
           td(v-for='day in days' :class='determineCellColor(day, user)' class='cell')
             div(v-if='availability && availability[user.id] && availability[user.id][day]')
               div(v-if='showHoliday' v-for='holiday in availability[user.id][day].holidays')
@@ -156,7 +156,7 @@ export default {
       countries: [],
       today: moment(),
       date: null,
-      daysShown: 10,
+      daysShown: 9,
       availability: null
     }
   },
