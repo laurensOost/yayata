@@ -5,10 +5,11 @@ div(v-if='user' class='d-flex user')
     class='avatar-container'
     :title='user.display_label'
     v-b-tooltip.left="{boundary: 'window'}"
+    /*:style="userColor(user.display_label)"*/
   )
     span(class='avatar-label') {{ user.display_label }}
     img(
-      class='img-fluid'
+      class='img-fluid d-block mx-auto'
       v-bind:style='{"max-height": avatarSize + "px"}'
       :src='getAvatarUrl(user)'
     )
@@ -33,6 +34,15 @@ export default {
 
   methods: {
     getAvatarUrl: utils.getAvatarUrl,
+
+    userColor: function(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      let h = hash % 360;
+      return 'background: repeating-linear-gradient(45deg, hsl('+h+', 30%, 90%), hsl('+h+', 30%, 90%) 5px, hsl('+h+', 30%, 80%) 5px, hsl('+h+', 30%, 80%) 10px);';
+    }
   }
 }
 </script>
@@ -44,14 +54,18 @@ export default {
 .avatar-container {
   display: block;
   width: 100%;
-  margin: -.1rem;
+  border: 1px solid #dee2e6;
+  border-radius: .2rem;
+  position: relative;
+  background-color: #dddddd;
 }
 
 .avatar-label {
+  padding-bottom: .2rem;
   position: absolute;
   bottom: 0;
-  left: .6rem;
-  right: .6rem;
+  left: 0;
+  right: 0;
   color: #000;
   font-size: 0.7rem;
   line-height: 0.7rem;
@@ -59,6 +73,6 @@ export default {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  text-shadow: 5px 5px 2px #FFFFFF, 5px -5px 2px #FFFFFF, -5px -5px 2px #FFFFFF, -5px 5px 2px #FFFFFF, -5px 5px 2px #FFFFFF;
+  background-color: rgba(255,255,255,.5);
 }
 </style>

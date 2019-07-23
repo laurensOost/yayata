@@ -95,31 +95,30 @@ div
       thead
         tr
           th(class='text-center') User
-          th(class='text-center' v-for='day in days') {{ day | moment('ddd, MMM Do') }}
+          template(v-for='day in days')
+            th(class='text-center' :class="determineMonthColor(day)")
+              div(class="month") {{ day | moment('MMM') }}
+              div(class="day") {{ day | moment('DD') }}
+              div(class="day_of_week") {{ day | moment('ddd') }}
       tbody
         tr(v-for='user in users')
           td(class='cell')
             div(class='row justify-content-center')
               ColleagueAvatarWidget(class='col' :user='user' size='40')
-          td(v-for='day in days' :class='determineCellColor(day, user)' class='cell')
+          td(v-for='day in days' :class='determineCellColor(day, user)' class='cell p-0')
             div(v-if='availability && availability[user.id] && availability[user.id][day]')
               div(v-if='showHoliday' v-for='holiday in availability[user.id][day].holidays')
                 div(class='cell-holiday badge')
                   | 🌐 {{ holiday.name }}
 
               div(v-if='showLeave' v-for='leave_date in availability[user.id][day].leave')
-                div(class='cell-leave badge')
-                  | 🏖️ {{ leave_date.starts_at | moment('HH:mm') }} - {{ leave_date.ends_at | moment('HH:mm') }}
+                div(class='cell-leave badge' :title='displayDateStartEnd(leave_date)' v-b-tooltip.right="{boundary: 'window'}") 🏖️
 
               div(v-if='showSickness' v-for='leave_date in availability[user.id][day].sickness')
-                div(class='cell-sickness badge')
-                  | 😷 {{ leave_date.starts_at | moment('HH:mm') }} - {{ leave_date.ends_at | moment('HH:mm') }}
+                div(class='cell-sickness badge' :title='displayDateStartEnd(leave_date)' v-b-tooltip.right="{boundary: 'window'}") 😷
 
               div(v-if='showWhereabout' v-for='whereabout in availability[user.id][day].whereabouts')
-                div(class='cell-whereabout badge text-left')
-                  | 📍 {{ whereabout.location.display_label }}
-                  br
-                  | &mdash;&nbsp;{{ whereabout.starts_at | moment('HH:mm') }} - {{ whereabout.ends_at | moment('HH:mm') }}
+                div(class='cell-whereabout badge' :title='displayDateStartEnd(whereabout, whereabout.location.display_label)' v-b-tooltip.right="{boundary: 'window'}") 📍
 </template>
 
 <script>
@@ -156,12 +155,12 @@ export default {
       countries: [],
       today: moment(),
       date: null,
-      daysShown: 9,
+      daysShown: 30,
       availability: null
     }
   },
 
- created: function() {
+  created: function() {
     this.setDate()
     this.reloadAvailability()
 
@@ -224,7 +223,7 @@ export default {
 
   methods: {
     selectNextPeriod: function() {
-      let new_date = moment(this.date).add(this.daysShown, 'days')
+      let new_date = moment(this.date).add(this.daysShown, 'days');
 
       this.$router.push({
         name: 'availability_week',
@@ -237,7 +236,7 @@ export default {
     },
 
     selectPreviousPeriod: function() {
-      let new_date = moment(this.date).subtract(this.daysShown, 'days')
+      let new_date = moment(this.date).subtract(this.daysShown, 'days');
 
       this.$router.push({
         name: 'availability_week',
@@ -288,6 +287,18 @@ export default {
 
       return cls.join(' ')
     },
+    determineMonthColor: function (date) {
+      let ret_class = "month_"+moment(date).format('MMM');
+      if(moment(date).day() === 6 || moment(date).day() === 0)
+         ret_class += " darken";
+      return ret_class
+    },
+    displayDateStartEnd: function (date, text="") {
+      if (text) {
+        text = text + " | "
+      }
+      return text + moment(date.starts_at).format('HH:mm') + "-" + moment(date.ends_at).format('HH:mm')
+    }
   },
 }
 </script>
@@ -302,8 +313,26 @@ export default {
 @nowork: #9e9d9d;
 @whereabout: #FBB829;
 
+/* Hand picked colors that has distinguishable transitions */
+@january: #FFD8CE;
+@february: #DEDCE6;
+@march: #FFF5CE;
+@april: #DDE8CB;
+@may: #FFD7D7;
+@june: #FFFFD7;
+@july: #FFDBB6;
+@august: #E0C2CD;
+@september: #DEE7E5;
+@october: #F7D1D5;
+@november: #F6F9D4;
+@december: #DEE6EF;
+
+.badge {
+  width: 100%;
+}
 .cell {
   vertical-align: middle;
+    font-size: 1.1em;
 }
 .cell-today {
   background: repeating-linear-gradient(
@@ -334,5 +363,56 @@ export default {
 }
 .cell-nowork {
   background-color: @nowork;
+}
+.month {
+  font-size: .7em;
+  text-transform: uppercase;
+  font-weight: normal;
+}
+.day {
+  font-size: 1.5em;
+}
+.day_of_week {
+  font-size: .7em;
+  bottom: 0;
+}
+.darken {
+  filter: brightness(85%);
+}
+.month_Jan {
+  background-color: @january;
+}
+.month_Feb {
+  background-color: @february;
+}
+.month_Mar {
+  background-color: @march;
+}
+.month_Apr {
+  background-color: @april;
+}
+.month_May {
+  background-color: @may;
+}
+.month_Jun {
+  background-color: @june;
+}
+.month_Jul {
+  background-color: @july;
+}
+.month_Aug {
+  background-color: @august;
+}
+.month_Sep {
+  background-color: @september;
+}
+.month_Oct {
+  background-color: @october;
+}
+.month_Nov {
+  background-color: @november;
+}
+.month_Dec {
+  background-color: @december;
 }
 </style>
