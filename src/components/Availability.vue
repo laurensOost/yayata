@@ -108,8 +108,7 @@ div
           td(v-for='day in days' :class='determineCellColor(day, user)' class='cell p-0')
             div(v-if='availability && availability[user.id] && availability[user.id][day]')
               div(v-if='showHoliday' v-for='holiday in availability[user.id][day].holidays')
-                div(class='cell-holiday badge')
-                  | 🌐 {{ holiday.name }}
+                div(class='cell-holiday badge' :title="holiday.name" v-b-tooltip.right="{boundary: 'window'}") 🌐
 
               div(v-if='showLeave' v-for='leave_date in availability[user.id][day].leave')
                 div(class='cell-leave badge' :title='displayDateStartEnd(leave_date)' v-b-tooltip.right="{boundary: 'window'}") 🏖️
@@ -329,10 +328,11 @@ export default {
 
 .badge {
   width: 100%;
+  font-size: 95%;
 }
 .cell {
   vertical-align: middle;
-    font-size: 1.1em;
+  font-size: 1.1em;
 }
 .cell-today {
   background: repeating-linear-gradient(
