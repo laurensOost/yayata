@@ -28,6 +28,7 @@ div
           th Date
           th Duration
           th Description
+          th Redmine entry
           th Error
   
       tbody
@@ -36,6 +37,7 @@ div
           td {{ performance.duration | round }} hours
           td
             vue-markdown(class='rendered-markdown' :source='performance.description')
+          td {{ performance.redmine_id }}
           td {{ performance.invalid_reason}}
 
   hr
