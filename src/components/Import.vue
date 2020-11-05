@@ -9,8 +9,31 @@ div
         b-dropdown(variant='outline-dark' v-if='timesheet' :text='"Timesheet: " + timesheet.display_label')
           b-dropdown-item(v-for='timesheet in timesheets' @click='selectTimesheet(timesheet)') {{ timesheet.display_label }}
 
-    div(class='col-auto btn-group' v-if='performances && performances.length')
-        button(class='btn btn-outline-primary' @click='executeImport()') Import
+    div(class='col-auto')
+      div(class='btn-group mr-2')
+          b-button(variant='outline-dark' v-if='invalidPerformances.length > 0' :pressed='showInvalidPerformances' v-on:click='toggleInvalidPerformancesWidget()')
+            i(class='fa' :class='{"fa-chevron-circle-up": showInvalidPerformances, "fa-chevron-circle-down": !showInvalidPerformances}') &nbsp;
+            strong Invalid entries found:&nbsp;
+            | {{ invalidPerformances.length }}
+      
+
+      div(class='btn-group')
+        button(class='btn btn-outline-primary' v-if='performances && performances.length' @click='executeImport()') Import
+
+  div(v-if='invalidPerformances.length > 0 && showInvalidPerformances')
+    hr
+    table(class='table table-striped table-bordered')
+      thead
+        tr
+          th Date
+          th Duration
+          th Message
+  
+      tbody
+        tr(v-for='(performance, i) in invalidPerformances')
+          td {{ performance.date | moment('DD/MM/YYYY') }}
+          td {{ performance.duration | round }} hours
+          td {{ performance.invalid_reason}}
 
   hr
 
@@ -42,9 +65,9 @@ div
           td
             b-form-checkbox(v-model='performancesToImport[i]' class='col') &nbsp;
         template(v-else)
-          td(colspan='2') Imported
+          td(colspan='2') Imported {{ performance.updated ? '(with different values)' : ''}}
 
-  div(class='alert alert-info text-center' v-else) No importable performances found. 😞
+  div(class='alert alert-info text-center' v-else) {{ emptyMessage }}
 </template>
 
 <script>
@@ -69,6 +92,9 @@ export default {
       selectAll: false,
       performances: [],
       performancesToImport: [],
+      showInvalidPerformances: false,
+      invalidPerformances: [],
+      emptyMessage: "No importable performances found. 😞"
     }
   },
 
@@ -182,15 +208,26 @@ export default {
           until: until.format('YYYY-MM-DD')
         }
       }).then((res) => {
-        let performances = res.data.results
+        let allPerformances = res.data.results
+        let importablePerformances = []
+        let unimportablePerformances = []
 
-        performances.forEach(performance => {
-          performance.performance_type = ((this.contracts[performance.contract].performance_types && this.contracts[performance.contract].performance_types.length) ? this.contracts[performance.contract].performance_types : this.performanceTypes)[0].id
-          performance.contract_role = this.contractUsers[performance.contract][0].contract_role.id
+        allPerformances.forEach(performance => {
+          if (performance.valid) {
+            performance.performance_type = ((this.contracts[performance.contract].performance_types && this.contracts[performance.contract].performance_types.length) ? this.contracts[performance.contract].performance_types : this.performanceTypes)[0].id
+            performance.contract_role = this.contractUsers[performance.contract][0].contract_role.id
+            importablePerformances.push(performance)
+          } else {
+            unimportablePerformances.push(performance)
+          }
         })
-
-        this.performances = performances
+        this.performances = importablePerformances
+        this.invalidPerformances = unimportablePerformances
         this.performancesToImport = Array(this.performances.length).fill(false)
+      }).catch((error) => {
+        if (error.body && error.body.message && error.status == 400) {
+          this.emptyMessage = error.body.message
+        }
       })
     },
 
@@ -221,6 +258,10 @@ export default {
       Promise.all(promises).then(() => {
         this.reloadPerformances()
       })
+    },
+
+    toggleInvalidPerformancesWidget: function() {
+      this.showInvalidPerformances = !this.showInvalidPerformances
     }
   },
 
