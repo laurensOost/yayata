@@ -27,12 +27,15 @@ div
         tr
           th Date
           th Duration
-          th Message
+          th Description
+          th Error
   
       tbody
         tr(v-for='(performance, i) in invalidPerformances')
           td {{ performance.date | moment('DD/MM/YYYY') }}
           td {{ performance.duration | round }} hours
+          td
+            vue-markdown(class='rendered-markdown' :source='performance.description')
           td {{ performance.invalid_reason}}
 
   hr
