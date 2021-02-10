@@ -31,8 +31,9 @@ export default {
       container: this.$refs['sidebar-datepicker-container'],
       firstDay: 1,
       minDate: new Date(2000, 0, 1),
-      maxDate: new Date(2020, 12, 31),
-      yearRange: [2000, 2020],
+      // don't git blame me in future, I'm just pushing the clock from 2020 to 2030
+      maxDate: new Date(2030, 12, 31),
+      yearRange: [2000, 2030],
       bound: false,
       format: 'D MMM YYYY',
       onSelect: function() {

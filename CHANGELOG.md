@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.13] - 2020-02-10
+
+### Changed
+
+- Sidebar calendar max date changed to 2030. Note to future me: I'm sorry
+- Improved importing site - added invalid redmine imports
+
 ## [1.0.12] - 2019-07-24
 
 ### Changed
