@@ -27,13 +27,17 @@ export default {
     sidebar: Sidebar
   },
 
-  created: () => {
-    new Promise((resolve, reject) => {
+  created () {
+    return new Promise((resolve, reject) => {
       if (!store.getters.user) {
-        store.dispatch(types.NINETOFIVER_RELOAD_USER).then(() => resolve())
-      } else{
-        resolve()
+        store.dispatch(types.NINETOFIVER_RELOAD_USER).then(() => {
+          resolve()
+        }, () => {
+          reject()
+        })
       }
+    }).catch(() => {
+      this.$router.push({name: 'auth.logout'})
     })
   },
 

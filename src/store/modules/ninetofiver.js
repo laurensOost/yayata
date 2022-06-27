@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import moment from 'moment';
 import * as types from '../mutation-types';
 
 // initial state
@@ -144,7 +143,16 @@ const getters = {
             route: {
                 name: 'faq'
             }
-        }
+        },
+        {
+            divider: true
+        },
+        {
+            label: 'Logout',
+            route: {
+                name: 'auth.logout',
+            }
+        },
     ],
 }
 
