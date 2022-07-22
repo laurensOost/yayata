@@ -158,7 +158,7 @@ div
 
           div(class='card-body p-0')
 
-          div(class='card-footer' v-if='getTimesheetForDay(date)')
+          div(class='card-footer')
             div(class='text-center')
               div(class='btn-group')
                 button(class='btn btn-outline-dark btn-sm' @click='addPerformance(date)' v-b-tooltip="{boundary: 'window'}" title='Log performance')
