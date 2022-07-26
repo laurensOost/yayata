@@ -134,6 +134,33 @@ export default {
       let dt_format = 'YYYY-MM-DDTHH:mm:00ZZ'
       let timezone = moment.tz.guess()
 
+      const send_leave_request = (body) => {
+        store.dispatch(types.NINETOFIVER_API_REQUEST, {
+          path: this.model.id ? `/leave/${this.model.id}/` : '/leave/',
+          method: this.model.id ? 'PUT' : 'POST',
+          body: body,
+        }).then((response) => {
+          this.$emit('success', response)
+          toastr.success('Leave requested.')
+          this.loading = false
+          this.resetForm()
+        }).catch((error) => {
+          this.$emit('error', error)
+          toastr.error('Error requesting leave.')
+
+          try {
+            for (var key in error.data) {
+              error.data[key].forEach((err) => {
+                toastr.error(err.message)
+              })
+            }
+          } catch (err) {
+          }
+
+          this.loading = false
+        });
+      }
+
       if (this.model.multiple_days) {
         let start_date = moment(this.model.start_date).tz(timezone).startOf('date')
         let end_date = moment(this.model.end_date).tz(timezone).endOf('date')
@@ -141,6 +168,8 @@ export default {
         body.full_day = true
         body.starts_at = start_date.format(dt_format)
         body.ends_at = end_date.format(dt_format)
+        // No need to check requested leave hours as this is calculated on the backend.
+        send_leave_request(body)
       } else {
         let from_time = moment(this.model.from_time, "HH:mm")
         let until_time = moment(this.model.until_time, "HH:mm")
@@ -148,34 +177,32 @@ export default {
         let start_date = moment(this.model.date).tz(timezone).hour(from_time.hour()).minute(from_time.minute()).second(0)
         let end_date = moment(this.model.date).tz(timezone).hour(until_time.hour()).minute(until_time.minute()).second(0)
 
-        body.full_day = false
-        body.starts_at = start_date.format(dt_format)
-        body.ends_at = end_date.format(dt_format)
-      }
-
-      store.dispatch(types.NINETOFIVER_API_REQUEST, {
-          path: this.model.id ? `/leave/${this.model.id}/` : '/leave/',
-          method: this.model.id ? 'PUT' : 'POST',
-          body: body,
-      }).then((response) => {
-        this.$emit('success', response)
-        toastr.success('Leave requested.')
-        this.loading = false
-        this.resetForm()
-      }).catch((error) => {
-        this.$emit('error', error)
-        toastr.error('Error requesting leave.')
-
-        try {
-          for (var key in error.data) {
-            error.data[key].forEach((err) => {
-              toastr.error(err.message)
-            })
+        // Get contract hours
+        store.dispatch(types.NINETOFIVER_API_REQUEST, {
+          path: '/range_info/',
+          params: {
+            'from': start_date.format('YYYY-MM-DD'),
+            'until': end_date.format('YYYY-MM-DD'),
+            'daily': true,
+            'detailed': true
           }
-        } catch(err) {}
+        }).then(res => {
+          // Error if requesting more leave hours than contract working hours.
+          if (moment.duration(until_time.diff(from_time)) > res.data.work_hours * 60 * 60 * 1e3) {
+            this.$emit('error', res)
+            toastr.error('Cannot request leave for more hours than your contract hours.')
+            this.loading = false
+          }
+          // Send the request when requesting a correct amount of leave hours.
+          else {
+            body.full_day = false
+            body.starts_at = start_date.format(dt_format)
+            body.ends_at = end_date.format(dt_format)
 
-        this.loading = false
-      });
+            send_leave_request(body)
+          }
+        })
+      }
     },
 
     remove: function() {
