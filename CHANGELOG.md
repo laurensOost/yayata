@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.17] - 2022-07-27
+
+### Added
+- Add planned leave overview of planned/approved hours.
+
+## [1.0.16] - 2022-07-26
+
+### Changed
+- Restrict maximum amount of requested leave hours per day to the contract hours.
+
+## [1.0.15] - 2022-07-22
+
+### Fixed
+- This Week page now does have available Log performance, Log whereabout and Request leave buttons for months with no timesheet yet.
+
+## [1.0.14] - 2022-06-28
+
+### Fixed
+- Blank screen bug fixed (at least some reasons are fixed).
+
+### Added
+- Added general error message to the login page.
+- New logout button added to left sidebar so the user is able to do a re-login by its own using UI.
+
+
 ## [1.0.13] - 2020-02-10
 
 ### Changed
