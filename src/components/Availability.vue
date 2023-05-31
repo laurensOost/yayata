@@ -2,9 +2,6 @@
 div
   div(class='row justify-content-between align-items-center')
     div(class='col-lg-auto text-center')
-      div(class='input-group input-group-sm mr-2')
-        b-form-input(:type='"text"' :placeholder='"Filter (eg. " + user.username + ")"' v-model="filterQuery" v-b-tooltip.top title="Tip: You can use ; to split search, like: tom;jan")
-
       div(class='btn-group' role='group')
         button(class='btn btn-sm btn-outline-dark' type='button' v-on:click.prevent='selectPreviousPeriod()')
           i(class='fa fa-angle-double-left')
@@ -14,6 +11,8 @@ div
         button(class='btn btn-sm btn-outline-dark' type='button' v-on:click.prevent='selectNextPeriod()')
           | Next&nbsp;
           i(class='fa fa-angle-double-right')
+      div(class='input-group input-group-sm mr-2')
+        b-form-input(:type='"text"' :placeholder='"Filter (eg. " + user.username + ")"' v-model="filterQuery" v-b-tooltip.top title="Tip: You can use ; to split search, like: tom;jan")
 
     div(class='col-lg-auto text-center')
       hr(class='d-lg-none')
