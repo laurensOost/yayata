@@ -91,7 +91,6 @@ export default {
   }
 
   .sidebar-datepicker {
-    //position: absolute;
     bottom: 0;
 
     .pika-lendar {
