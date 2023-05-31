@@ -79,7 +79,7 @@ div
         b-card-body
           div
             | Both YAYATA (the front-end) and 925r (the back-end + API) are released under the GPLv3, and their sources are available on github.<br>
-            | The source for YAYATA can be found <a href="https://github.com/kalmanolah/yayata">here</a>, whereas the source for 925r can be found <a href="https://github.com/kalmanolah/925r">here</a>.<br>
+            | The source for YAYATA can be found <a href="https://github.com/inuits/yayata">here</a>, whereas the source for 925r can be found <a href="https://github.com/inuits/925r">here</a>.<br>
             | Pull requests, issues and other contributions are encouraged and welcome.<br>
 
     b-card(
@@ -132,7 +132,6 @@ div
         b-card-body
           div
             | Consider contacting your friendly neighbourhood YAYATA administrator. Chances are they'll know what to do.<br>
-            | Alternately, you can also open a <a href="https://github.com/kalmanolah/yayata/issues/new?labels=question">new issue</a> over at the github repository.<br>
             | Once your question has been answered, you can ask for it to be considered for addition to the FAQ.<br>
 </template>
 

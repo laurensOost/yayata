@@ -1,10 +1,10 @@
 <template lang="pug">
 div
   div(class='sidebar')
-    div(class='sidebar-container p-4')
+    div(class='sidebar-container p-4 overflow-auto')
       router-link(:to='{ name: "home" }')
         img(class='img-fluid mb-4' src='../assets/img/logo_text.svg')
-
+      
       nav(class='nav flex-column nav-pills')
         template(v-for='navbarItem in navbarItems')
           div(v-if='navbarItem.divider')
@@ -82,6 +82,7 @@ export default {
   }
 
   .nav {
+    position: relative;
     .nav-link {
       &:hover {
         background: rgba(0, 0, 0, 0.05);
@@ -90,7 +91,6 @@ export default {
   }
 
   .sidebar-datepicker {
-    position: absolute;
     bottom: 0;
 
     .pika-lendar {
