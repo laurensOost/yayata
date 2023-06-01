@@ -86,7 +86,6 @@ export default {
         }
       }).then((res) => {
         this.absentUsers = []
-        console.log(this.userHours)
         for (let i = 0; i < store.getters.users.length; i++) {
           const user = store.getters.users[i];
           const leave = res.data[user.id][this.selectedDay.format('YYYY-MM-DD')]
@@ -104,7 +103,6 @@ export default {
             //! prototype #46517
             const leaveStart = moment(leave["leave"][0]["starts_at"]) // todo: not just 0
             const leaveEnd = moment(leave["leave"][0]["ends_at"])
-            console.log(leaveEnd.diff(leaveStart,"hours"))
             user["fullDay"] = leaveEnd.diff(leaveStart,"hours") > leave["work_hours"] / 2 ? "fa fa-hourglass hourglass" : "fa fa-hourglass-end hourglass-end"
             user["dayTooltip"] = leaveEnd.diff(leaveStart,"hours") > leave["work_hours"] / 2 ? "Full-day" : "Half-day"
             
