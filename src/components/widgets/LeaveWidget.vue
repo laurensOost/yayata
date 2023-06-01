@@ -74,7 +74,6 @@ export default {
 
   created: function() {
     submit = this.submit
-    console.log(store.getters.contracts)
     Promise.all([
       new Promise((resolve,reject)=>{
         // fetch work hours
@@ -363,7 +362,6 @@ export default {
                 onclick:(model)=>{
                   const fromHours = model.from_time.split(":")
                   const toHour = Math.floor(parseInt(fromHours[0])+(model.workHours/2))
-                  console.log(toHour)
                   model.until_time = `${toHour < 10 ?`0${toHour}`:`${toHour}`}:${fromHours[1]}`
                   
                 }
