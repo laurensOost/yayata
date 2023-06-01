@@ -86,7 +86,6 @@ export default {
         }
       }).then((res) => {
         this.absentUsers = []
-        this.userHours = res.data[store.getters.user.id][moment(moment.now()).format("YYYY-MM-DD")]["work_hours"]
         console.log(this.userHours)
         for (let i = 0; i < store.getters.users.length; i++) {
           const user = store.getters.users[i];
