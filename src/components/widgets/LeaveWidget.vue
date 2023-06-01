@@ -53,12 +53,13 @@ var model = {
   from_time: '09:00',
   until_time: null,
   multiple_days: false,
-  status: 'draft'
+  status: 'draft',
 }
 var submit = null
 var dateSet = false
 var startDateSet = false
 var endDateSet = false
+var workHours = 0
 
 export default {
   name: 'LeaveWidget',
@@ -73,8 +74,21 @@ export default {
 
   created: function() {
     submit = this.submit
-
+    console.log(store.getters.contracts)
     Promise.all([
+      new Promise((resolve,reject)=>{
+        // fetch work hours
+        store.dispatch(types.NINETOFIVER_API_REQUEST, {
+        path: '/range_availability/',
+        params: {
+          from: moment(moment.now()).format("YYYY-MM-DD"),
+          until: moment(moment.now()).format("YYYY-MM-DD")
+        }
+      }).then((res) => {
+        this.workHours = res.data[store.getters.user.id][moment(moment.now()).format("YYYY-MM-DD")]["work_hours"]
+        this.resetForm()
+      });
+      }),
       new Promise((resolve, reject) => {
         if (!store.getters.leave_types) {
           store.dispatch(types.NINETOFIVER_RELOAD_LEAVE_TYPES).then(() => resolve())
@@ -342,7 +356,23 @@ export default {
             required: true,
             validator: VueFormGenerator.validators.time,
             values: utils.getTimeOptions().map(x => { return {id: x, name: x} }),
-            styleClasses: ['third-width-md', 'single-day-input']
+            styleClasses: ['third-width-md', 'single-day-input'],
+            buttons:[
+              {
+                classes:"btn fa fa-hourglass-end hourglass-end",
+                onclick:(model)=>{
+                  model.from_time="09:00"
+                  model.until_time ="13:00"
+                }
+              },
+              {
+                classes:"btn fa fa-hourglass hourglass",
+                onclick:(model)=>{
+                  model.from_time="09:00"
+                  model.until_time ="17:00"
+                }
+              }
+            ]
           },
           {
             type: "select",
