@@ -7,6 +7,7 @@ const key = {
     PERFORMANCE_SELECTED_CONTRACT_ID: 'performance_selected_contract_id',
     WHEREABOUT_SELECTED_LOCATION_ID: 'whereabout_selected_location_id',
     SHOW_UPDATED_NOTIFICATION: 'show_updated_notification',
+    STANDBY_SELECTED_CONTRACT_ID:'standby_selected_contract_id'
 }
 
 
