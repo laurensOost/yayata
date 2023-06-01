@@ -90,6 +90,7 @@ export default {
           const user = store.getters.users[i];
           const leave = res.data[user.id][this.selectedDay.format('YYYY-MM-DD')]
           if(leave['sickness'].length > 0){
+            console.log(leave["sickness"])
             // is sick
             user["absenceIcon"] = "fa fa-plus-square plus-square"
             user["absenceType"] = "Sickness"
@@ -100,11 +101,10 @@ export default {
             user["absenceIcon"] = "fa fa-calendar calendar"
             user["absenceType"] = "Other"
 
-            //! prototype #46517
-            const leaveStart = moment(leave["leave"][0]["starts_at"]) // todo: not just 0
+            const leaveStart = moment(leave["leave"][0]["starts_at"])
             const leaveEnd = moment(leave["leave"][0]["ends_at"])
-            user["fullDay"] = leaveEnd.diff(leaveStart,"hours") > leave["work_hours"] / 2 ? "fa fa-hourglass hourglass" : "fa fa-hourglass-end hourglass-end"
-            user["dayTooltip"] = leaveEnd.diff(leaveStart,"hours") > leave["work_hours"] / 2 ? "Full-day" : "Half-day"
+            user["fullDay"] = leaveEnd.diff(leaveStart,"hours") >= leave["work_hours"] ? "fa fa-hourglass hourglass" : "fa fa-hourglass-end hourglass-end"
+            user["dayTooltip"] = leaveEnd.diff(leaveStart,"hours") >= leave["work_hours"] ? "Full-day" : "Half-day"
             
             this.absentUsers.push(user)
           }
