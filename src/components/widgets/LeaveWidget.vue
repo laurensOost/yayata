@@ -54,12 +54,12 @@ var model = {
   until_time: null,
   multiple_days: false,
   status: 'draft',
+  workHours:0
 }
 var submit = null
 var dateSet = false
 var startDateSet = false
 var endDateSet = false
-var workHours = 0
 
 export default {
   name: 'LeaveWidget',
@@ -85,7 +85,7 @@ export default {
           until: moment(moment.now()).format("YYYY-MM-DD")
         }
       }).then((res) => {
-        this.workHours = res.data[store.getters.user.id][moment(moment.now()).format("YYYY-MM-DD")]["work_hours"]
+        this.model.workHours = res.data[store.getters.user.id][moment(moment.now()).format("YYYY-MM-DD")]["work_hours"]
         this.resetForm()
       });
       }),
@@ -361,15 +361,20 @@ export default {
               {
                 classes:"btn fa fa-hourglass-end hourglass-end",
                 onclick:(model)=>{
-                  model.from_time="09:00"
-                  model.until_time ="13:00"
+                  const fromHours = model.from_time.split(":")
+                  const toHour = Math.floor(parseInt(fromHours[0])+(model.workHours/2))
+                  console.log(toHour)
+                  model.until_time = `${toHour < 10 ?`0${toHour}`:`${toHour}`}:${fromHours[1]}`
+                  
                 }
               },
               {
                 classes:"btn fa fa-hourglass hourglass",
                 onclick:(model)=>{
-                  model.from_time="09:00"
-                  model.until_time ="17:00"
+                  const fromHours = model.from_time.split(":")
+                  const toHour = Math.floor(parseInt(fromHours[0])+model.workHours)
+                  model.until_time = `${toHour < 10 ?`0${toHour}`:`${toHour}`}:${fromHours[1]}`
+
                 }
               }
             ]
