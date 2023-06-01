@@ -8,13 +8,15 @@ div(class='card card-top-blue mb-3')
       i(class='fa fa-chevron-right chevron' @click='dayLater')
 
   div(class='row justify-content-center m-0 p-1' v-if='absentUsers.length')
-    ColleagueAvatarWidget(
-      v-for='(user, index) in absentUsers'
-      v-bind:key='user.id'
-      :user='user'
-      size='64'
-      class='col-auto p-1'
-    )
+    div(v-for='(user, index) in absentUsers')
+      i( :class="user.absenceIcon" class="dist-icon" v-b-tooltip.left :title="user.absenceType")
+      i(v-if="user['absenceType'] == 'Other'" :class="user.fullDay" v-b-tooltip.left :title="user.dayTooltip" class="dist-icon-more")
+      ColleagueAvatarWidget(
+        v-bind:key='user.id'
+        :user='user'
+        size='64'
+        class='col-auto p-1'
+      )
 
   table(class='table my-0' v-if='holidays.length')
     tbody
@@ -83,9 +85,29 @@ export default {
           until: this.selectedDay.format('YYYY-MM-DD')
         }
       }).then((res) => {
-        this.absentUsers = store.getters.users.filter(user => {
-          return (res.data[user.id][this.selectedDay.format('YYYY-MM-DD')]['sickness'].length > 0) || (res.data[user.id][this.selectedDay.format('YYYY-MM-DD')]['leave'].length > 0)
-        })
+        this.absentUsers = []
+        for (let i = 0; i < store.getters.users.length; i++) {
+          const user = store.getters.users[i];
+          const leave = res.data[user.id][this.selectedDay.format('YYYY-MM-DD')]
+          if(leave['sickness'].length > 0){
+            // is sick
+            user["absenceIcon"] = "fa fa-plus-square plus-square"
+            user["absenceType"] = "Sickness"
+            this.absentUsers.push(user)
+          }
+          else if(leave['leave'].length > 0){
+            // other leave type
+            user["absenceIcon"] = "fa fa-calendar calendar"
+            user["absenceType"] = "Other"
+
+            const leaveStart = moment(leave["leave"][0]["starts_at"])
+            const leaveEnd = moment(leave["leave"][0]["ends_at"])
+            user["fullDay"] = leaveEnd.diff(leaveStart,"hours") >= leave["work_hours"] ? "fa fa-hourglass hourglass" : "fa fa-hourglass-end hourglass-end"
+            user["dayTooltip"] = leaveEnd.diff(leaveStart,"hours") >= leave["work_hours"] ? "Full-day" : "Half-day"
+            
+            this.absentUsers.push(user)
+          }
+        }
       });
 
       store.dispatch(types.NINETOFIVER_API_REQUEST, {
@@ -99,6 +121,7 @@ export default {
     }
   }
 }
+
 </script>
 
 <style lang="less" scoped>
@@ -108,5 +131,26 @@ export default {
   &:hover {
     cursor: pointer;
   }
+}
+
+.dist-icon{
+  position: relative;
+  top: 20px;
+  z-index: 1;
+  background-color: #fff;
+  padding: 4px;
+  border-radius: 8px;
+  margin-top: -20px;
+}
+
+.dist-icon-more{
+  position: relative;
+  top: 45px;
+  left:-22px;
+  z-index: 1;
+  background-color: #fff;
+  padding: 4px;
+  border-radius: 8px;
+  margin-top: -20px;
 }
 </style>
