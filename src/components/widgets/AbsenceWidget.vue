@@ -90,7 +90,6 @@ export default {
           const user = store.getters.users[i];
           const leave = res.data[user.id][this.selectedDay.format('YYYY-MM-DD')]
           if(leave['sickness'].length > 0){
-            console.log(leave["sickness"])
             // is sick
             user["absenceIcon"] = "fa fa-plus-square plus-square"
             user["absenceType"] = "Sickness"
