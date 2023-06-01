@@ -87,7 +87,7 @@ export default {
       this.loading = true
 
       let contracts = this.model.contracts.slice(0)
-              preferences.set(preferences.key.STANDBY_SELECTED_CONTRACT_ID,contracts)
+      preferences.set(preferences.key.STANDBY_SELECTED_CONTRACT_ID,contracts)
       let contractsWithPerformances = this.model.performances.map(performance => performance.contract.id)
       // Every performance not belonging to a selected contract is deleted
       let performancesToDelete = this.model.performances.filter(performance => !contracts.includes(performance.contract.id))
