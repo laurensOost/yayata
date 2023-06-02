@@ -66,6 +66,7 @@ div
                     small(v-if='dayDetails.holiday_hours' v-b-tooltip title="Holiday") 🌐
                     small(v-if='dayDetails.leave_hours' v-b-tooltip title="Leave") 🏖️
                     small(v-if='dayDetails.pending_leave_hours' v-b-tooltip title="Pending leave") ❓🏖
+                    small(v-if='dayDetails.standby_performances.length > 0' v-b-tooltip title="Standby / On-call") 💤
 
                 div(class='card-text text-right')
                   small
@@ -175,7 +176,8 @@ export default {
         params: {
           'from': start.format('YYYY-MM-DD'),
           'until': end.format('YYYY-MM-DD'),
-          'daily': true
+          'daily': true,
+          'detailed': true
         }
       }).then(res => {
         this.rangeInfo = res.data
