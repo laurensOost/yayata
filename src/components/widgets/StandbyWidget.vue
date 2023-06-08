@@ -17,6 +17,7 @@ import moment from 'moment';
 import VueFormGenerator from 'vue-form-generator';
 import toastr from 'toastr';
 import * as types from '../../store/mutation-types';
+import preferences from '../../preferences';
 import store from '../../store';
 
 var model = {
@@ -58,7 +59,7 @@ export default {
     resetForm: function() {
       new Promise((resolve, reject) => {
         this.model.date = this.date ? moment(this.date).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD')
-
+        
         if (this.performances) {
           resolve(this.performances)
         } else {
@@ -74,10 +75,10 @@ export default {
         }
       }).then(performances => {
         this.model.performances = performances
-
-        this.model.contracts = this.model.performances.map(performance => {
+        const defaultContracts = this.model.performances.map(performance => {
           return performance.contract.id
         })
+        this.model.contracts = preferences.get(preferences.key.STANDBY_SELECTED_CONTRACT_ID,defaultContracts)
       })
     },
 
@@ -86,8 +87,8 @@ export default {
       this.loading = true
 
       let contracts = this.model.contracts.slice(0)
+      preferences.set(preferences.key.STANDBY_SELECTED_CONTRACT_ID,contracts)
       let contractsWithPerformances = this.model.performances.map(performance => performance.contract.id)
-
       // Every performance not belonging to a selected contract is deleted
       let performancesToDelete = this.model.performances.filter(performance => !contracts.includes(performance.contract.id))
       Promise.all(performancesToDelete.map(performance => {
