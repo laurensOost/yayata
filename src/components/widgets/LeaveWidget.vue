@@ -127,7 +127,9 @@ export default {
         this.model.end_date = moment(date)
         this.model.date = moment(date)
         this.model.from_time = '09:00'
-        this.model.until_time = '17:00'
+        const fromHours = model.from_time.split(":")
+        const toHour = Math.floor(parseInt(fromHours[0])+model.workHours)
+        this.model.until_time = `${toHour < 10 ?`0${toHour}`:`${toHour}`}:${fromHours[1]}`
       }
 
       dateSet = false
