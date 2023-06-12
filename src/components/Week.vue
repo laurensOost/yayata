@@ -303,6 +303,15 @@ export default {
 
     setDate: function() {
       this.date = moment().isoWeekYear(this.$route.params.year).isoWeek(this.$route.params.week).startOf('isoWeek')
+      if(this.$route.params.week > 52 && this.date.week() !== 53){
+        this.$router.push({
+          name: 'calendar_week',
+          params: {
+            week: this.date.week(),
+            year: this.date.year()
+          }
+        })
+      }
     },
 
     reloadData: function() {
