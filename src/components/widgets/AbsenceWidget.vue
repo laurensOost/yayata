@@ -102,8 +102,8 @@ export default {
 
             const leaveStart = moment(leave["leave"][0]["starts_at"])
             const leaveEnd = moment(leave["leave"][0]["ends_at"])
-            user["fullDay"] = leaveEnd.diff(leaveStart,"hours") >= leave["work_hours"] ? "fa fa-hourglass hourglass" : "fa fa-hourglass-end hourglass-end"
-            user["dayTooltip"] = leaveEnd.diff(leaveStart,"hours") >= leave["work_hours"] ? "Full-day" : "Half-day"
+            user["fullDay"] = leaveEnd.diff(leaveStart, "minutes") >= (leave["work_hours"]*60-1) ? "fa fa-hourglass hourglass" : "fa fa-hourglass-end hourglass-end"
+            user["dayTooltip"] = leaveEnd.diff(leaveStart, "minutes") >= (leave["work_hours"]*60-1) ? "Full-day" : "Half-day"
             
             this.absentUsers.push(user)
           }
