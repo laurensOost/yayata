@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.18] - 2023-06-21
+
+### Added
+- In the Dashboard - Absences widget - there are new icons or full/half day absences, and another icons to distinguish sickness and holidays.
+- In the Dashboard - Request leave widget - there are new icons for easier booking of half/full day.
+- Yayata remembers last selected contract for standby/oncall.
+- Oncall icon 'zzZ' is shown in monthly overview.
+- Hot-reload for yayata running in docker. 
+### Fixed
+- Year/week numbers in the URL should show correct numbers in the first weeks of the new year.
+- FAQ poits to Inuits GitHub fork not to Kalman Olah's Github repo's.
+- When zoom in the page there is a slider for menu.
+### Changed
+- Username filter moved to the left in the availability view.
+
 ## [1.0.17] - 2022-07-27
 
 ### Added
