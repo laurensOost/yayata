@@ -139,6 +139,43 @@ a {
       padding-left: 5px;
     }
   }
+
+  .quarter-width-md {
+    width: 25%;
+    float: left;
+    padding-right: 5px;
+
+    &+ .quarter-width-md {
+      padding-left: 5px;
+    }
+  }
+
+  .quarter2-width-md {
+    width: 25%;
+    float: left;
+
+    &+ .quarter-width-md {
+      padding-left: 5px;
+    }
+  }
+
+  .a-width-md {
+    width: 21%;
+    float: left;
+
+    &+ .a-width-md {
+      padding-left: 5px;
+    }
+  }
+
+  .b-width-md {
+    width: 8%;
+    float: left;
+
+    &+ .b-width-md {
+      padding-left: 5px;
+    }
+  }
 }
 
 .white-space-normal {

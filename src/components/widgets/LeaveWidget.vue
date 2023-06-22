@@ -339,7 +339,7 @@ export default {
             // visible: function(model) {
             //   return !model.multiple_days
             // },
-            styleClasses: ['third-width-md', 'single-day-input']
+            styleClasses: ['quarter-width-md', 'single-day-input']
           },
           {
             type: "select",
@@ -348,7 +348,7 @@ export default {
             required: true,
             validator: VueFormGenerator.validators.time,
             values: utils.getTimeOptions().map(x => { return {id: x, name: x} }),
-            styleClasses: ['third-width-md', 'single-day-input']
+            styleClasses: ['a-width-md', 'single-day-input']
           },
           {
             type: "select",
@@ -357,10 +357,18 @@ export default {
             required: true,
             validator: VueFormGenerator.validators.time,
             values: utils.getTimeOptions().map(x => { return {id: x, name: x} }),
-            styleClasses: ['third-width-md', 'single-day-input'],
+            styleClasses: ['a-width-md', 'single-day-input'],
+          },
+          {
+            type: "button",
+            model: "until_time",
+            required: true,
+            validator: VueFormGenerator.validators.time,
+            values: utils.getTimeOptions().map(x => { return {id: x, name: x} }),
+            styleClasses: ['b-width-md', 'single-day-input'],
             buttons:[
               {
-                classes:"btn fa fa-hourglass-end hourglass-end",
+                classes:"btn btn-lg btn-link fa fa-hourglass-end hourglass-end",
                 onclick:(model)=>{
                   const fromHours = model.from_time.split(":")
                   const toHour = Math.floor(parseInt(fromHours[0])+(model.workHours/2))
@@ -369,7 +377,7 @@ export default {
                 }
               },
               {
-                classes:"btn fa fa-hourglass hourglass",
+                classes:"btn btn-lg btn-link fa fa-hourglass hourglass",
                 onclick:(model)=>{
                   const fromHours = model.from_time.split(":")
                   const toHour = Math.floor(parseInt(fromHours[0])+model.workHours)
@@ -395,11 +403,13 @@ export default {
 
               return []
             },
-            validator: VueFormGenerator.validators.required
+            validator: VueFormGenerator.validators.required,
+            styleClasses: ['quarter2-width-md', 'single-day-input'],
           },
           {
             type: "textArea",
-            label: "Description",
+            // label: "Description",
+            placeholder: "Description", 
             model: "description",
             max: 255,
             rows: 2,
