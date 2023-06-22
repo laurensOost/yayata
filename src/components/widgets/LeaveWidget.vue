@@ -360,7 +360,8 @@ export default {
             styleClasses: ['a-width-md', 'single-day-input'],
           },
           {
-            type: "button",
+            type: "input",
+            label: "1/2",
             model: "until_time",
             required: true,
             validator: VueFormGenerator.validators.time,
@@ -368,7 +369,7 @@ export default {
             styleClasses: ['b-width-md', 'single-day-input'],
             buttons:[
               {
-                classes:"btn btn-link fa fa-hourglass-end hourglass-end",
+                classes:"btn btn-primary fa fa-hourglass-end hourglass-end",
                 onclick:(model)=>{
                   const fromHours = model.from_time.split(":")
                   const toHour = Math.floor(parseInt(fromHours[0])+(model.workHours/2))
@@ -438,5 +439,9 @@ export default {
   .multiple-days-input {
     display: none;
   }
+}
+
+.btn {
+    height: 37px;
 }
 </style>

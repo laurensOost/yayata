@@ -147,9 +147,9 @@ a {
   }
 
   .quarter2-width-md {
-    width: 25%;
-    float: left;
-    padding-left: 3px;
+    width: 24%;
+    float: right;
+    padding-left: 2px;
   }
 
   .a-width-md {
@@ -162,9 +162,8 @@ a {
   .b-width-md {
     width: 8%;
     float: left;
-    padding-top: 35px;
-    padding-left: 3px;
-    padding-right: 1px;
+    padding-left: 2px;
+    padding-right: 2px;
   }
 }
 
