@@ -143,38 +143,28 @@ a {
   .quarter-width-md {
     width: 25%;
     float: left;
-    padding-right: 5px;
-
-    &+ .quarter-width-md {
-      padding-left: 5px;
-    }
+    padding-right: 3px;
   }
 
   .quarter2-width-md {
     width: 25%;
     float: left;
-
-    &+ .quarter-width-md {
-      padding-left: 5px;
-    }
+    padding-left: 3px;
   }
 
   .a-width-md {
     width: 21%;
     float: left;
-
-    &+ .a-width-md {
-      padding-left: 5px;
-    }
+    padding-left: 2px;
+    padding-right: 2px;
   }
 
   .b-width-md {
     width: 8%;
     float: left;
-
-    &+ .b-width-md {
-      padding-left: 5px;
-    }
+    padding-top: 35px;
+    padding-left: 3px;
+    padding-right: 1px;
   }
 }
 

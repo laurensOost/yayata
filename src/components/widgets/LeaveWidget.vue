@@ -368,7 +368,7 @@ export default {
             styleClasses: ['b-width-md', 'single-day-input'],
             buttons:[
               {
-                classes:"btn btn-lg btn-link fa fa-hourglass-end hourglass-end",
+                classes:"btn btn-link fa fa-hourglass-end hourglass-end",
                 onclick:(model)=>{
                   const fromHours = model.from_time.split(":")
                   const toHour = Math.floor(parseInt(fromHours[0])+(model.workHours/2))
@@ -376,15 +376,6 @@ export default {
                   
                 }
               },
-              {
-                classes:"btn btn-lg btn-link fa fa-hourglass hourglass",
-                onclick:(model)=>{
-                  const fromHours = model.from_time.split(":")
-                  const toHour = Math.floor(parseInt(fromHours[0])+model.workHours)
-                  model.until_time = `${toHour < 10 ?`0${toHour}`:`${toHour}`}:${fromHours[1]}`
-
-                }
-              }
             ]
           },
           {
