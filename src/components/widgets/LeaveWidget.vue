@@ -339,7 +339,7 @@ export default {
             // visible: function(model) {
             //   return !model.multiple_days
             // },
-            styleClasses: ['quarter-width-md', 'single-day-input']
+            styleClasses: ['third-width-md', 'single-day-input']
           },
           {
             type: "select",
@@ -380,6 +380,15 @@ export default {
             ]
           },
           {
+            type: "textArea",
+            // label: "Description",
+            placeholder: "Description", 
+            model: "description",
+            max: 255,
+            rows: 2,
+            validator: VueFormGenerator.validators.string
+          },
+          {
             type: "select",
             label: "Type",
             model: "leave_type",
@@ -396,16 +405,6 @@ export default {
               return []
             },
             validator: VueFormGenerator.validators.required,
-            styleClasses: ['quarter2-width-md', 'single-day-input'],
-          },
-          {
-            type: "textArea",
-            // label: "Description",
-            placeholder: "Description", 
-            model: "description",
-            max: 255,
-            rows: 2,
-            validator: VueFormGenerator.validators.string
           },
           {
             type: "submit",

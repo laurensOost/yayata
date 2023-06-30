@@ -134,36 +134,25 @@ a {
   .third-width-md {
     width: 33%;
     float: left;
+    padding-right: 2px;
 
     &+ .third-width-md {
       padding-left: 5px;
     }
   }
 
-  .quarter-width-md {
-    width: 25%;
-    float: left;
-    padding-right: 3px;
-  }
-
-  .quarter2-width-md {
-    width: 24%;
-    float: right;
-    padding-left: 2px;
-  }
-
   .a-width-md {
-    width: 21%;
+    width: 29%;
     float: left;
     padding-left: 2px;
     padding-right: 2px;
   }
 
   .b-width-md {
-    width: 8%;
-    float: left;
+    width: 9%;
+    float: right;
     padding-left: 2px;
-    padding-right: 2px;
+    // padding-right: 2px;
   }
 }
 
