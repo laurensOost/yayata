@@ -24,6 +24,22 @@ div(class='card card-top-blue mb-3')
         },
         :width='95',
       )
+      button(
+        v-if='!model.multiple_days'
+        @click='changeHalfDay(true)'
+        variant="primary"
+        class="btn btn-primary btn-sm fa fa-hourglass-end hourglass-end"
+        style="margin-left:5px;"
+        v-b-tooltip.hover title="Half-day"
+      )
+      button(
+        v-if='!model.multiple_days'
+        @click='changeHalfDay(false)'
+        variant="primary"
+        class="btn btn-primary btn-sm fa fa-hourglass hourglass"
+        v-b-tooltip.hover title="Full day"
+        style="margin-left:5px;"
+      )
 
     vue-form-generator(:schema="schema" :model="model" :options="formOptions" v-bind:class='{ "single-day": !model.multiple_days, "multiple-days": model.multiple_days }')
 
@@ -105,6 +121,19 @@ export default {
       this.model.multiple_days = !this.model.multiple_days
     },
 
+    changeHalfDay: function(half){
+      const fromHours = this.model.from_time.split(":")
+      let toHour = "17:00"
+      if(half){
+        toHour = Math.round(parseInt(fromHours[0])+(model.workHours/2))
+      }
+      else{
+        toHour = Math.round(parseInt(fromHours[0])+(model.workHours))
+      }
+      
+      this.model.until_time = `${toHour < 10 ?`0${toHour}`:`${toHour}`}:${fromHours[1]}`
+    },
+
     resetForm: function() {
       if (this.leave) {
         this.model.id = this.leave.id
@@ -128,7 +157,7 @@ export default {
         this.model.date = moment(date)
         this.model.from_time = '09:00'
         const fromHours = model.from_time.split(":")
-        const toHour = Math.floor(parseInt(fromHours[0])+model.workHours)
+        const toHour = Math.round(parseInt(fromHours[0])+model.workHours)
         this.model.until_time = `${toHour < 10 ?`0${toHour}`:`${toHour}`}:${fromHours[1]}`
       }
 
@@ -358,26 +387,6 @@ export default {
             validator: VueFormGenerator.validators.time,
             values: utils.getTimeOptions().map(x => { return {id: x, name: x} }),
             styleClasses: ['a-width-md', 'single-day-input'],
-          },
-          {
-            type: "input",
-            label: "1/2",
-            model: "until_time",
-            required: true,
-            validator: VueFormGenerator.validators.time,
-            values: utils.getTimeOptions().map(x => { return {id: x, name: x} }),
-            styleClasses: ['b-width-md', 'single-day-input'],
-            buttons:[
-              {
-                classes:"btn btn-primary fa fa-hourglass-end hourglass-end",
-                onclick:(model)=>{
-                  const fromHours = model.from_time.split(":")
-                  const toHour = Math.floor(parseInt(fromHours[0])+(model.workHours/2))
-                  model.until_time = `${toHour < 10 ?`0${toHour}`:`${toHour}`}:${fromHours[1]}`
-                  
-                }
-              },
-            ]
           },
           {
             type: "textArea",
