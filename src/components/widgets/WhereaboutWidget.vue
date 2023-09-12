@@ -126,7 +126,8 @@ export default {
     submit: function(event) {
       if (this.loading) return
       if (!this.validate()) return
-      if (event && (event.target.tagName !== 'INPUT')) return
+      console.log(event)
+      if (event && (event.target.tagName !== 'INPUT' || event.type === "keyup")) return
 
       this.loading = true
 
