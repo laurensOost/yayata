@@ -4,21 +4,17 @@ div(class='card card-top-blue mb-3')
     span 📝 Summary for&nbsp;
       router-link(:to='{ name: "calendar_month", params: { year: timesheet.year, month: timesheet.month } }')
         | {{ timesheet | timesheetDate | moment('MMMM YYYY') }}
-    toggle-button(
-      v-if='timesheet.status !== "closed"'
-      @change='submitTimesheet',
-      :color={checked: '#f0ad4e', unchecked: '#5cb85c'},
-      :value='timesheet.status !== "active"',
-      :sync='true',
-      :labels={
-        checked: 'Pending',
-        unchecked: 'Active'
-      },
-      :width='70',
+    b-button(
+      @click='submitTimesheet',
       :disabled='timesheet.status !== "active"',
+      :variant='timesheet.status === "active"?"primary":"secondary"'
       ref='timesheetSubmissionToggle'
+    ) Submit timesheet
+    b-badge(
+      style="height:37px; line-height:25px;"
+      :variant='timesheet.status === "active" ? "success" : timesheet.status === "closed" ? "danger" : "warning"'
     )
-    b-badge(v-else variant='secondary') Closed
+      span(class="align-middle") {{ timesheet.status == "active" ? "Active" : timesheet.status == "closed" ? "Closed" : "Pending"}}
 
   table(class='table my-0')
     tbody(v-if='rangeInfo')
