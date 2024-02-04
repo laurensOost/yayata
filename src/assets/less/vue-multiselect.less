@@ -1,12 +1,33 @@
 .multiselect {
-    min-height: 30px;
+    min-height: 38px;
     color: #495057;
 
-    > .multiselect__select {
-        height: 28px;
+    & > .multiselect__select {
+        height: 38px;
     }
 
-    > .multiselect__tags {
-        min-height: 30px;
+    & > .multiselect__tags {
+        min-height: 38px;
+        border-radius: 0.25rem;
+
+        & > .multiselect__input {
+            padding: 0;
+
+            &::placeholder {
+                color: #adadad;
+                display: inline-block;
+                margin-bottom: 10px;
+                font-size: 0.875em;
+            }
+        }
+
+        & > .multiselect__placeholder {
+            padding-top: 0;
+            margin-bottom: 0;
+        }
+    }
+
+    &.multiselect--active .multiselect__placeholder {
+        display: inline-block;
     }
 }
