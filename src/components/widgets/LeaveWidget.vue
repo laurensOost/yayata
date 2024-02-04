@@ -436,7 +436,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .multiple-days {
   .single-day-input {
     display: none;
