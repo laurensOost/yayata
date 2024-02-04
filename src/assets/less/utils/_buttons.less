@@ -1,0 +1,46 @@
+.button-variant(
+  @background,
+  @color: color-yiq(@background, #212529, #fff, 150),
+  @border: @background,
+  @hover-background: darken(@background, 7.5%),
+  @hover-color: color-yiq(@hover-background, #212529, #fff, 150),
+  @hover-border: darken(@border, 10%),
+  @active-background: darken(@background, 10%),
+  @active-color: color-yiq(@active-background, #212529, #fff, 150),
+  @active-border: darken(@border, 12.5%)
+) {
+  color: @color;
+  background-color: @background;
+  border-color: @border;
+  box-shadow: none;
+
+  &:hover {
+    color: @hover-color;
+    background-color: @hover-background;
+    border-color: @hover-border;
+  }
+
+  &:focus, &.focus {
+    color: @hover-color;
+    background-color: @hover-background;
+    border-color: @hover-border;
+  }
+
+  &.disabled, &:disabled {
+    color: @color;
+    background-color: @background;
+    border-color: @border;
+  }
+
+  &:not(:disabled):not(.disabled):active,
+  &:not(:disabled):not(.disabled).active,
+  .show > &.dropdown-toggle {
+    color: @active-color;
+    background-color: @active-background;
+    border-color: @active-border;
+  }
+}
+
+.btn-square {
+  aspect-ratio: 1 / 1;
+}
