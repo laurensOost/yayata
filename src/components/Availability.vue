@@ -1,93 +1,72 @@
 <template lang="pug">
 div
-  div(class='row justify-content-between align-items-center')
-    div(class='col-lg-auto text-center')
-      div(class='btn-group' role='group')
-        button(class='btn btn-sm btn-outline-dark' type='button' v-on:click.prevent='selectPreviousPeriod()')
-          i(class='fa fa-angle-double-left')
-          | &nbsp;Previous
-        button(class='btn btn-sm btn-outline-dark disabled' type='button')
-          | {{ days[0] | moment('YYYY-MM-DD') }} - {{ days[days.length - 1] | moment('YYYY-MM-DD') }}
-        button(class='btn btn-sm btn-outline-dark' type='button' v-on:click.prevent='selectNextPeriod()')
-          | Next&nbsp;
-          i(class='fa fa-angle-double-right')
-      div(class='input-group input-group-sm mr-2')
-        b-form-input(:type='"text"' :placeholder='"Filter (eg. " + user.username + ")"' v-model="filterQuery" v-b-tooltip.top title="Tip: You can use ; to split search, like: tom;jan")
-
-    div(class='col-lg-auto text-center')
-      hr(class='d-lg-none')
-
-      toggle-button(
-        class='my-0'
-        @change='showSickness = !showSickness',
-        :value='showSickness',
-        color='#ff4444',
-        :sync='true',
-        :labels={
-          checked: 'Sickness',
-          unchecked: 'Sickness'
-        },
-        :width='80'
+  div(class='row justify-content-start align-items-start')
+    div(class='col-3')
+      label
+        | Usernames
+      b-form-input(
+        v-model="filterQuery",
+        type='text',
+        :placeholder='"Filter (eg. " + user.username + ")"'
+        v-b-tooltip.top,
+        title="Tip: You can use ; to split search, like: tom;jan"
       )
-      toggle-button(
-        class='my-0'
-        @change='showLeave = !showLeave',
-        :value='showLeave',
-        color='#00c851',
-        :sync='true',
-        :labels={
-          checked: 'Leave',
-          unchecked: 'Leave'
-        },
-        :width='65'
+    div(class='col-3')
+      label
+        | Country
+      multiselect(
+        v-model="filterCountry",
+        :options="countriesFilter",
+        :show-labels="false",
+        :searchable="false",
+        :allow-empty='true',
+        label='label',
+        track-by='value',
+        placeholder="Belgium, Czechia, ...",
       )
-      toggle-button(
-        class='my-0'
-        @change='showHoliday = !showHoliday',
-        :value='showHoliday',
-        color='#59b8e6',
-        :sync='true',
-        :labels={
-          checked: 'Holiday',
-          unchecked: 'Holiday'
-        },
-        :width='70'
+    div(class='col-3')
+      label
+        | Location
+      multiselect(
+        v-model="filterLocation",
+        :options="locationsFilter",
+        :multiple='true',
+        :close-on-select="false",
+        :clear-on-select="false",
+        :preserve-search="true",
+        label='label',
+        track-by='value',
+        placeholder="Home, Ghent, ..."
+        :preselect-first="true"
       )
-      toggle-button(
-        class='my-0'
-        @change='showWhereabout = !showWhereabout',
-        :value='showWhereabout',
-        color='#FBB829',
-        :sync='true',
-        :labels={
-          checked: 'Whereabout',
-          unchecked: 'Whereabout'
-        },
-        :width='90'
-      )
-      toggle-button(
-        class='my-0'
-        @change='showNoWork = !showNoWork',
-        :value='showNoWork',
-        color='#9e9d9d',
-        :sync='true',
-        :labels={
-          checked: 'Not working',
-          unchecked: 'Not working'
-        },
-        :width='90'
-      )
-
-    div(class='col-lg-auto')
-      hr(class='d-lg-none')
-
-      div(class='btn-toolbar justify-content-center')
-        div(class='btn-group btn-group-sm' role='group')
-          b-dropdown(variant='outline-dark' size='sm' right :text='filterCountry ? filterCountry : "Country"')
-            b-dropdown-item(@click='filterByCountry()') All
-            b-dropdown-item(v-for='country in countries' @click='filterByCountry(country)') {{ country }}
 
   hr
+
+  div(class='row align-items-center mb-2')
+    div(class='col-auto')
+      div(class='d-flex align-items-center')
+        button(class='btn btn-info btn-sm btn-square fa fa-chevron-left' v-on:click.prevent='selectPreviousPeriod()')
+        p(class='m-0 mx-2')
+          | {{ days[0] | moment('YYYY-MM-DD') }} - {{ days[days.length - 1] | moment('YYYY-MM-DD') }}
+        button(class='btn btn-info btn-sm btn-square fa fa-chevron-right' v-on:click.prevent='selectNextPeriod()')
+
+    div(class='col-auto')
+      div(class='d-flex align-items-center gx-2')
+        button(class='btn btn-sm btn-sickness' :class='{ "btn-soft": !showSickness }' @click='showSickness = !showSickness')
+          | Sickness
+          i(class='fa fa-check')
+        button(class='btn btn-sm btn-leave' :class='{ "btn-soft": !showLeave }' @click='showLeave = !showLeave')
+          | Leave
+          i(class='fa fa-check')
+        button(class='btn btn-sm btn-holiday' :class='{ "btn-soft": !showHoliday }' @click='showHoliday = !showHoliday')
+          | Holiday
+          i(class='fa fa-check')
+        button(class='btn btn-sm btn-whereabout' :class='{ "btn-soft": !showWhereabout }' @click='showWhereabout = !showWhereabout')
+          | Whereabout
+          i(class='fa fa-check')
+        button(class='btn btn-sm btn-nowork' :class='{ "btn-soft": !showNoWork }' @click='showNoWork = !showNoWork')
+          | Not working
+          i(class='fa fa-check')
 
   div(class='table-responsive')
     table(class='table table-bordered table-sm' v-if='days')
@@ -107,25 +86,29 @@ div
           td(v-for='day in days' :class='determineCellColor(day, user)' class='cell p-0')
             div(v-if='availability && availability[user.id] && availability[user.id][day]')
               div(v-if='showHoliday' v-for='holiday in availability[user.id][day].holidays')
-                div(class='cell-holiday badge' :title="holiday.name" v-b-tooltip.right="{boundary: 'window'}") 🌐
+                div(class='cell-holiday badge' :title="holiday.name" v-b-tooltip.right="{boundary: 'window'}")
+                  | 🌐
 
               div(v-if='showLeave' v-for='leave_date in availability[user.id][day].leave')
-                div(class='cell-leave badge' :title='displayDateStartEnd(leave_date)' v-b-tooltip.right="{boundary: 'window'}") 🏖️
+                div(class='cell-leave badge' :title='displayDateStartEnd(leave_date)' v-b-tooltip.right="{boundary: 'window'}")
+                  | 🏖️
 
               div(v-if='showSickness' v-for='leave_date in availability[user.id][day].sickness')
-                div(class='cell-sickness badge' :title='displayDateStartEnd(leave_date)' v-b-tooltip.right="{boundary: 'window'}") 😷
+                div(class='cell-sickness badge' :title='displayDateStartEnd(leave_date)' v-b-tooltip.right="{boundary: 'window'}")
+                  | 😷
 
               div(v-if='showWhereabout' v-for='whereabout in availability[user.id][day].whereabouts')
-                div(class='cell-whereabout badge' :title='displayDateStartEnd(whereabout, whereabout.location.display_label)' v-b-tooltip.right="{boundary: 'window'}") 📍
+                div(class='cell-whereabout badge' v-if="isWhereaboutVisible(whereabout)" :title='displayDateStartEnd(whereabout, whereabout.location.display_label)' v-b-tooltip.right="{boundary: 'window'}")
+                  | 📍
 </template>
 
 <script>
-import Vue from 'vue';
 import store from '../store';
 import * as types from '../store/mutation-types';
-import utils from '../utils';
 import moment from 'moment';
 import ColleagueAvatarWidget from './widgets/ColleagueAvatarWidget.vue';
+import {find, some} from "lodash";
+import {ISOCountries} from "../utils/countries";
 
 export default {
   name: 'Availability',
@@ -135,22 +118,35 @@ export default {
   },
 
   watch: {
-    '$route': function(to, from) {
+    '$route': function () {
       this.setDate()
       this.reloadAvailability()
     },
+
+    filterLocation: function () {
+      if (some(this.filterLocation, ['value', ''])) {
+        this.filterLocation = []
+      }
+    },
+    filterCountry: function () {
+      if (this.filterCountry && this.filterCountry.value === '') {
+        this.filterCountry = null
+      }
+    }
   },
 
   data() {
     return {
       filterQuery: null,
       filterCountry: null,
+      filterLocation: null,
       showHoliday: true,
       showLeave: true,
       showNoWork: true,
       showSickness: true,
       showWhereabout: true,
       countries: [],
+      locations: [],
       today: moment(),
       date: null,
       daysShown: 30,
@@ -162,7 +158,17 @@ export default {
     this.setDate()
     this.reloadAvailability()
 
-    new Promise((resolve, reject) => {
+    new Promise((resolve) => {
+      if (!store.getters.locations) {
+        store.dispatch(types.NINETOFIVER_RELOAD_LOCATIONS).then(() => resolve())
+      } else{
+        resolve()
+      }
+    }).then(() => {
+      this.locations = store.getters.locations;
+    })
+
+    new Promise((resolve) => {
       if (!store.getters.users) {
         store.dispatch(types.NINETOFIVER_RELOAD_USERS).then(() => resolve())
       } else{
@@ -180,6 +186,25 @@ export default {
   },
 
   computed: {
+    countriesFilter: function() {
+      console.log(this.countries);
+      return [
+        {label: 'All', value: ''},
+        ...this.countries.map(country => {
+          return {label: find(ISOCountries, ['alpha2', country]).name || country, value: country}
+        })
+      ]
+    },
+
+    locationsFilter: function() {
+      return [
+        {label: 'All', value: ''},
+        ...this.locations.map(location => {
+          return {label: location.display_label, value: location.id}
+        })
+      ]
+    },
+
     user: () => store.getters.user,
 
     users: function() {
@@ -188,7 +213,7 @@ export default {
 
         if (this.filterCountry) {
           users = users.filter(user => {
-            return user.userinfo && user.userinfo.country === this.filterCountry
+            return user.userinfo && user.userinfo.country === this.filterCountry.value
           })
         }
 
@@ -266,14 +291,10 @@ export default {
       })
     },
 
-    filterByCountry: function(country) {
-      this.filterCountry = country
-    },
-
     determineCellColor: function(date, user) {
       let cls = []
 
-      if (date == this.today.format('YYYY-MM-DD')) {
+      if (date === this.today.format('YYYY-MM-DD')) {
         cls.push('cell-today')
       }
 
@@ -284,6 +305,13 @@ export default {
       }
 
       return cls.join(' ')
+    },
+    isWhereaboutVisible(whereabout) {
+      if (!this.filterLocation || this.filterLocation.length === 0) {
+        return true
+      }
+
+      return some(this.filterLocation, ['value', whereabout.location.id]);
     },
     determineMonthColor: function (date) {
       let ret_class = "month_"+moment(date).format('MMM');
@@ -302,14 +330,16 @@ export default {
 </script>
 
 <style lang='less' scoped>
+@import "../assets/less/utils/utils";
+
 @highlight: #333333;
 @sickness: #ff4444;
 @sicknessPending: #f58585;
 @leave: #00c851;
 @leavePending: #48f490;
 @holiday: #59b8e6;
-@nowork: #9e9d9d;
 @whereabout: #FBB829;
+@nowork: #9e9d9d;
 
 /* Hand picked colors that has distinguishable transitions */
 @january: #FFD8CE;
@@ -324,6 +354,37 @@ export default {
 @october: #F7D1D5;
 @november: #F6F9D4;
 @december: #DEE6EF;
+
+@buttons: {
+  sickness: @sickness;
+  leave: @leave;
+  holiday: @holiday;
+  whereabout: @whereabout;
+  nowork: @nowork;
+};
+
+each(@buttons, {
+  .btn-@{key} {
+    .button-variant(@value, @color: #fff, @hover-color: #fff, @active-color: #fff);
+
+    i {
+      transition: all 0.15s;
+
+      margin-left: 8px;
+    }
+
+    &.btn-soft {
+      .button-variant(tint(@value, 25%), @color: #fff, @hover-color: #fff, @active-color: #fff);
+
+      i {
+        transform: scale(0);
+        transform-origin: center;
+        font-size: 0;
+        margin-left: 0;
+      }
+    }
+  }
+})
 
 .badge {
   width: 100%;
