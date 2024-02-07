@@ -23,6 +23,9 @@ import 'vue-multiselect/dist/vue-multiselect.min.css'
 import './assets/less/vue-multiselect.less'
 import VueMultiselect from 'vue-multiselect'
 
+// Less Styles
+import "./assets/less/utils/utils.less"
+
 // toastr
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
