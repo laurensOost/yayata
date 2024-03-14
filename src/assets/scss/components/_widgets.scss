@@ -1,0 +1,56 @@
+@import "../bootstrap/theme";
+
+$widget-horizontal-padding: 22px;
+$widget-vertical-padding: 14px;
+
+.widget-py {
+  padding-top: $widget-vertical-padding;
+  padding-bottom: $widget-vertical-padding;
+}
+
+.widget-px {
+  padding-left: $widget-horizontal-padding;
+  padding-right: $widget-horizontal-padding;
+}
+
+.widget-card {
+  border-radius: 12px;
+  color: $gray-900;
+  border: 1px solid $gray-400;
+  overflow: hidden;
+
+  .card-header {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: $gray-900;
+    line-height: 110%;
+
+    & > p, span {
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: $gray-900;
+      line-height: 110%;
+    }
+
+    background-color: $white;
+    border-bottom: none;
+  }
+
+  .card-body {
+    padding: 0;
+
+    & .form-group {
+      label {
+        color: $gray-900;
+        font-size: 0.875rem;
+        font-weight: normal;
+        line-height: 1rem;
+        margin-bottom: 4px;
+      }
+    }
+  }
+
+  button {
+    font-variant: small-caps;
+  }
+}

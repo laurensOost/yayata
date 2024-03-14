@@ -15,8 +15,7 @@ import { ClientTable } from 'vue-tables-2'
 
 // Bootstrap
 import BootstrapVue from 'bootstrap-vue'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap-vue/dist/bootstrap-vue.min.css'
+import './assets/scss/bootstrap/theme.scss'
 
 // VueMultiSelect
 import 'vue-multiselect/dist/vue-multiselect.min.css'
@@ -36,12 +35,16 @@ import VueMoment from 'vue-moment'
 
 // fontawesome
 import 'font-awesome/css/font-awesome.min.css'
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 // Pikaday
 import Pikaday from 'pikaday'
 import 'pikaday/css/pikaday.css'
 window.moment = moment // Required because vue-form-generator sucks
 window.Pikaday = Pikaday // Required before vue-form-generator sucks
+
+import DatePicker from "vue2-datepicker";
+import 'vue2-datepicker/index.css';
 
 import App from './components/App.vue'
 import Auth from './components/Auth.vue'
@@ -70,7 +73,9 @@ Vue.use(VueFormGenerator)
 Vue.use(ClientTable, null, null, 'bootstrap4')
 Vue.use(VueMarkdown)
 Vue.use(VueProgressBar)
+Vue.use(DatePicker)
 Vue.component('multiselect', VueMultiselect)
+Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 // Global toast options
 toastr.options = {

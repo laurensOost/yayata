@@ -34,16 +34,16 @@
                 v-for='year in years'
                 v-on:click.prevent='filterByYear(year)'
                 class='nav-link nav-item'
-                v-bind:class='{"active": year == filterYear}'
+                :class='{"active": year === filterYear}'
                 href='#'
               ) {{ year }}
 
             div(class='list-group list-group-flush')
-              li(class='list-group-item list-group-item-action cursor-pointer p-2' v-for='leave in filteredLeave' v-on:click.prevent='leave.status == "pending" ? editLeave(leave) : null')
+              li(class='list-group-item list-group-item-action cursor-pointer p-2' v-for='leave in filteredLeave' v-on:click.prevent='editLeave(leave)')
                 div(class='d-flex justify-content-between')
                   div {{ leave.leave_type.display_label }}
                   div
-                    span(class='badge' v-bind:class='{"bg-danger": leave.status == "rejected", "bg-warning": leave.status == "pending", "bg-success": leave.status == "approved"}') {{ leave.status }}
+                    span(class='badge' :class='{"bg-danger": leave.status === "rejected", "bg-warning": leave.status === "pending", "bg-success": leave.status === "approved"}') {{ leave.status }}
                 div(class='d-flex justify-content-between')
                   div
                     div(v-for='leave_date in leave.leavedate_set' class='text-muted')
@@ -91,9 +91,11 @@ export default {
     filteredLeave: function() {
       if (this.leave) {
         return this.leave.filter(leave => {
-          return moment(leave.leavedate_set[0].starts_at).format('YYYY') == this.filterYear
+          return moment(leave.leavedate_set[0].starts_at).format('YYYY') === this.filterYear
         })
       }
+
+      return []
     },
   },
 
@@ -138,8 +140,6 @@ export default {
     },
 
     reloadData: function() {
-      let now = moment()
-
       store.dispatch(types.NINETOFIVER_API_REQUEST, {
         path: '/leave/',
         params: {
@@ -164,6 +164,8 @@ export default {
     },
 
     editLeave: function(leave) {
+      if(leave.status !== "pending") return
+
       this.selectedLeave = leave
       this.$refs.leaveModal.show()
     },
