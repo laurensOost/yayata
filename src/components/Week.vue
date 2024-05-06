@@ -31,7 +31,7 @@ div
 
   hr
 
-  b-modal(ref='performanceModal' hide-header=true hide-footer=true lazy=true size='lg')
+  b-modal(ref='performanceModal' hide-header=true hide-footer=true lazy=true size='lg' content-class="bg-transparent border-0")
     PerformanceWidget(
       :performance='selectedPerformance'
       :date='selectedDate'

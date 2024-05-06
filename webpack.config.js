@@ -140,6 +140,16 @@ module.exports = (env, argv) => {
           }]
         },
         {
+          test: /\.(scss|sass)$/,
+          use: [{
+              loader: 'vue-style-loader'
+          }, {
+              loader: 'css-loader'
+          }, {
+              loader: 'sass-loader'
+          }]
+        },
+        {
           test: /\.css$/,
           use: [{
             loader: 'vue-style-loader'

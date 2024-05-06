@@ -1,0 +1,13 @@
+@for $i from 0 through 10 {
+  .gx-#{$i} {
+    column-gap: #{$i * 4}px;
+  }
+
+  .gy-#{$i} {
+    row-gap: #{$i * 4}px;
+  }
+
+  .g-#{$i} {
+    gap: #{$i * 4}px;
+  }
+}

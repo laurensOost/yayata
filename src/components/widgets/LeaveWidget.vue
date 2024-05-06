@@ -1,113 +1,286 @@
+<script setup>
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import {faHourglassHalf, faHourglassEnd} from "@fortawesome/free-solid-svg-icons";
+</script>
+
 <template lang="pug">
-div(class='card card-top-blue mb-3')
-  div(class='card-header text-center') 🏖️&nbsp;
-    span(v-if='!model.id') Request leave
-    span(v-else) Update leave
-  div(class='card-body')
-    b-alert(
-      variant='warning'
-      :show='!isFutureLeave()'
-    )
-      h5(class='alert-heading') You are not requesting leave in the future!
-      | Please keep in mind that your request will receive additional review, since leave should only be requested for future dates under normal circumstances.<br>
-      | Adding a description is highly recommended.<br>
-
-    div(class='text-center')
-      toggle-button(
-        @change='toggleMultipleDays()',
-        :value='model.multiple_days',
-        :sync='true',
-        :color={checked: '#f0ad4e', unchecked: '#5cb85c'},
-        :labels={
-          checked: 'Multiple days',
-          unchecked: 'Single day'
-        },
-        :width='95',
+  div(class='card widget-card widget-px widget-py shadow-sm mb-3')
+    div(class="card-header mb-3 p-0")
+      span(v-if='!model.id') Request leave
+      span(v-else) Update leave
+    div(class='card-body')
+      b-alert(
+        variant='secondary-soft'
+        class='text-secondary border border-secondary'
+        :show='!isFutureLeave'
       )
-      button(
-        v-if='!model.multiple_days'
-        @click='changeHalfDay(true)'
-        variant="primary"
-        class="btn btn-primary btn-sm fa fa-hourglass-end hourglass-end"
-        style="margin-left:5px;"
-        v-b-tooltip.hover title="Half-day"
-      )
-      button(
-        v-if='!model.multiple_days'
-        @click='changeHalfDay(false)'
-        variant="primary"
-        class="btn btn-primary btn-sm fa fa-hourglass hourglass"
-        v-b-tooltip.hover title="Full day"
-        style="margin-left:5px;"
-      )
+        h5(class='alert-heading') You are not requesting leave in the future!
+        | Please keep in mind that your request will receive additional review, since leave should only be requested for future dates under normal circumstances.<br>
+        | Adding a description is highly recommended.<br>
 
-    vue-form-generator(:schema="schema" :model="model" :options="formOptions" v-bind:class='{ "single-day": !model.multiple_days, "multiple-days": model.multiple_days }')
+      b-alert(
+        variant='danger-soft'
+        class='text-danger border border-danger'
+        :show='!isMultipleDays && isGreaterThanWorkHours'
+      )
+        h5(class='alert-heading') You are requesting more hours than your contract allows!
+        | You are trying to request leave for more hours than your contract allows. Change the time range to proceeed.
 
-    div(class='form-group')
-      div(class='row justify-content-between')
-        div(class='col')
-          input(class='btn btn-primary' type="submit" value="Save" @click="submit()")
-        div(class='col-auto' v-if='model.id')
-          input(class='btn btn-danger' type="submit" value="Delete" @click="remove()")
+      div(class='form-group mb-2')
+        label(for='leave_type') Type
+        b-form-select(
+          v-model='model.leave_type'
+          :options='leaveTypes'
+          :required='true'
+          :placeholder='model.leave_type ? "" : "Select leave type"'
+          id='leave_type'
+          text-field="display_label"
+          value-field="id"
+        )
+          template(v-slot:first)
+            b-form-select-option(:value='null' disabled)
+              | < Nothing selected >
+
+      div(class='d-flex gx-3 mb-2')
+        div(class='form-group w-50 m-0')
+          label(for='time_from') Time from
+          date-picker(
+            v-model='model.timeFrom'
+            type='datetime'
+            format='YYYY-MM-DD HH:mm'
+            :placeholder='new Date() | moment("YYYY-MM-DD HH:mm")'
+            :lang="datePickerLang"
+            :time-picker-options='{ start: "06:00", step: "00:15", end: "20:00" }'
+            :shortcuts='datePickerShortcuts'
+            id='time_from'
+            @change="handleDatesChange"
+          )
+
+        div(class='form-group w-50 m-0')
+          label(for='time_to') Time to
+          date-picker(
+            v-model='model.timeTo'
+            type='datetime'
+            format='YYYY-MM-DD HH:mm',
+            :placeholder='new Date() | moment("YYYY-MM-DD HH:mm")'
+            :lang="datePickerLang"
+            :time-picker-options='{ start: "06:00", step: "00:15", end: "20:00" }'
+            :shortcuts='datePickerShortcuts'
+            id='time_to'
+            @change="handleDatesChange"
+          )
+
+      div(class='form-group')
+        label(for='description') Description
+        b-form-textarea(
+          v-model='model.description'
+          :max='255'
+          :rows='2'
+          id='description'
+          placeholder='Description'
+        )
+
+      div(class='d-flex align-items-end')
+        div(class='w-50 d-flex align-items-end gx-2')
+          button(
+            class='btn btn-primary-soft btn-sm btn-square text-primary d-flex align-items-center'
+            v-b-tooltip.bottom
+            :title="'Half day'"
+            @click="changeHalfDay(true)"
+          )
+            FontAwesomeIcon(:icon='faHourglassEnd' :style="{'aspect-ratio': '1/1' }" )
+          button(
+            class='btn btn-primary-soft btn-sm btn-square text-primary d-flex align-items-center'
+            v-b-tooltip.bottom
+            :title="'Full day'"
+            @click="changeHalfDay(false)"
+          )
+            FontAwesomeIcon(:icon='faHourglassHalf' :style="{'aspect-ratio': '1/1'}" )
+        div(class='w-50 d-flex justify-content-end align-items-end gx-2')
+          button(
+            v-if="model.id"
+            class='btn btn-danger-soft text-danger'
+            type="submit"
+            @click="remove()"
+          ) delete
+
+          button(
+            class='btn btn-primary-soft text-primary'
+            type="submit"
+            @click="submit()"
+          ) request leave
 </template>
 
 <script>
-import moment from 'moment-timezone';
-import VueFormGenerator from 'vue-form-generator';
+import moment from 'moment';
+import DatePicker from "vue2-datepicker";
 import toastr from 'toastr';
 import * as types from '../../store/mutation-types';
 import store from '../../store';
-import utils from '../../utils';
-
-var model = {
-  id: null,
-  leave_type: null,
-  description: null,
-  start_date: moment(),
-  end_date: moment(),
-  date: moment(),
-  from_time: '09:00',
-  until_time: null,
-  multiple_days: false,
-  status: 'draft',
-  workHours:0
-}
-var submit = null
-var dateSet = false
-var startDateSet = false
-var endDateSet = false
+import {isDate} from "lodash";
 
 export default {
   name: 'LeaveWidget',
 
-  mixins: [
-  ],
+  components: {
+    DatePicker,
+  },
 
   props: [
     'leave',
     'date',
   ],
 
-  created: function() {
-    submit = this.submit
+  data: () => {
+    return {
+      loading: false,
+
+      model: {
+        id: null,
+        leave_type: null,
+        description: null,
+        status: 'draft',
+        timeFrom: new Date(),
+        timeTo: new Date(),
+      },
+
+      workHours: 0,
+      workHoursForSelectedDate: -1,
+
+      datePickerLang: {
+        formatLocale: {
+          firstDayOfWeek: 1,
+        }
+      },
+      datePickerShortcuts: [
+        {
+          text: 'Today',
+          onClick: () => new Date(),
+        },
+        {
+          text: 'Yesterday',
+          onClick: () => moment().subtract(1, 'days').toDate(),
+        },
+        {
+          text: 'Tomorrow',
+          onClick: () => moment().add(1, 'days').toDate(),
+        },
+        {
+          text: 'Next week start',
+          onClick: () => moment().add(1, 'weeks').startOf('week').set({
+            hour: 9,
+            minute: 0,
+          }).toDate(),
+        },
+        {
+          text: 'Next week end',
+          onClick: () => moment().add(1, 'weeks').endOf('week').set({
+            hour: 17,
+            minute: 0,
+          }).toDate(),
+        },
+        {
+          text: 'Last week start',
+          onClick: () => moment().subtract(1, 'weeks').startOf('week').set({
+            hour: 9,
+            minute: 0,
+          }).toDate(),
+        },
+        {
+          text: 'Last week end',
+          onClick: () => moment().subtract(1, 'weeks').endOf('week').set({
+            hour: 17,
+            minute: 0,
+          }).toDate(),
+        }
+      ],
+    }
+  },
+
+  computed: {
+    leaveTypes() {
+      if (!store.getters.leave_types) return [];
+
+      return store.getters.leave_types
+    },
+    isMultipleDays() {
+      return Math.abs(moment(this.model.timeFrom).diff(moment(this.model.timeTo), 'days')) > 0
+    },
+    isFutureLeave() {
+      return moment(this.model.timeFrom).isAfter(moment(), 'day')
+    },
+    isGreaterThanWorkHours() {
+      if (this.workHoursForSelectedDate === -1) return false
+
+      return Math.abs(moment(this.model.timeTo).diff(moment(this.model.timeFrom), 'milliseconds')) > this.workHoursForSelectedDate * 60 * 60 * 1e3
+    }
+  },
+
+  watch: {
+    'model.timeFrom'(value) {
+      if (moment(value).isAfter(this.model.timeTo)) {
+        this.$set(
+            this.model,
+            'timeTo',
+            value
+        )
+      }
+
+      this.workHoursForSelectedDate = -1
+    },
+    'model.timeTo'(value) {
+      console.log(value)
+      if (moment(value).isBefore(this.model.timeFrom)) {
+        this.$set(
+            this.model,
+            'timeFrom',
+            value
+        )
+      }
+
+      this.workHoursForSelectedDate = -1
+    },
+    isMultipleDays(value) {
+      if (value) {
+        this.$set(
+            this.model,
+            'timeFrom',
+            moment(this.model.timeFrom).set({
+              hour: 9,
+              minute: 0,
+            }).toDate()
+        )
+        this.$set(
+            this.model,
+            'timeTo',
+            moment(this.model.timeTo).set({
+              hour: 17,
+              minute: 0,
+            }).toDate()
+        )
+      }
+    }
+  },
+
+  created: function () {
     Promise.all([
-      new Promise((resolve,reject)=>{
+      new Promise(() => {
         // fetch work hours
         store.dispatch(types.NINETOFIVER_API_REQUEST, {
-        path: '/range_availability/',
-        params: {
-          from: moment(moment.now()).format("YYYY-MM-DD"),
-          until: moment(moment.now()).format("YYYY-MM-DD")
-        }
-      }).then((res) => {
-        this.model.workHours = res.data[store.getters.user.id][moment(moment.now()).format("YYYY-MM-DD")]["work_hours"]
-        this.resetForm()
-      });
+          path: '/range_availability/',
+          params: {
+            from: moment(moment.now()).format("YYYY-MM-DD"),
+            until: moment(moment.now()).format("YYYY-MM-DD")
+          }
+        }).then((res) => {
+          this.workHours = res.data[store.getters.user.id][moment(moment.now()).format("YYYY-MM-DD")]["work_hours"]
+          this.resetForm()
+        });
       }),
-      new Promise((resolve, reject) => {
+      new Promise((resolve) => {
         if (!store.getters.leave_types) {
           store.dispatch(types.NINETOFIVER_RELOAD_LEAVE_TYPES).then(() => resolve())
-        } else{
+        } else {
           resolve()
         }
       }),
@@ -117,57 +290,173 @@ export default {
   },
 
   methods: {
-    toggleMultipleDays: function() {
-      this.model.multiple_days = !this.model.multiple_days
+    async handleDatesChange() {
+      console.log(moment(this.model.timeTo).set({
+        hour: 17,
+        minute: 0,
+      }).toDate())
+      if (this.isMultipleDays) {
+        this.$set(
+            this.model,
+            'timeFrom',
+            moment(this.model.timeFrom).set({
+              hour: 9,
+              minute: 0,
+            }).toDate()
+        )
+        this.$set(
+            this.model,
+            'timeTo',
+            moment(this.model.timeTo).set({
+              hour: 17,
+              minute: 0,
+            }).toDate()
+        )
+      }
+    },
+    async setWorkingHoursForTheDate() {
+      if (!this.isMultipleDays) {
+        const rangeInfo = await this.getRangeInfo(moment(this.model.timeFrom), moment(this.model.timeTo))
+        this.workHoursForSelectedDate = rangeInfo.data.work_hours
+      }
+    },
+    changeHalfDay(half) {
+      const fromHours = moment(this.model.timeFrom).hours();
+      const toHour = Math.round(fromHours + (this.workHours * (half ? 0.5 : 1)))
+
+      this.$set(
+          this.model,
+          'timeFrom',
+          moment(this.model.timeFrom).set({
+            hour: fromHours,
+            minute: 0,
+          }).toDate()
+      )
+      this.$set(
+          this.model,
+          'timeTo',
+          moment(this.model.timeTo).set({
+            hour: toHour,
+            minute: 0,
+          }).toDate()
+      )
     },
 
-    changeHalfDay: function(half){
-      const fromHours = this.model.from_time.split(":")
-      let toHour = "17:00"
-      if(half){
-        toHour = Math.round(parseInt(fromHours[0])+(model.workHours/2))
-      }
-      else{
-        toHour = Math.round(parseInt(fromHours[0])+(model.workHours))
-      }
-      
-      this.model.until_time = `${toHour < 10 ?`0${toHour}`:`${toHour}`}:${fromHours[1]}`
-    },
-
-    resetForm: function() {
+    resetForm() {
       if (this.leave) {
-        this.model.id = this.leave.id
-        this.model.description = this.leave.description
-        this.model.leave_type = this.leave.leave_type.id
-        this.model.multiple_days = this.leave.leavedate_set.length > 1
-        this.model.date = moment(this.leave.leavedate_set[0].starts_at)
-        this.model.start_date = moment(this.leave.leavedate_set[0].starts_at)
-        this.model.end_date = moment(this.leave.leavedate_set[this.leave.leavedate_set.length - 1].ends_at)
-        this.model.from_time = moment(this.leave.leavedate_set[0].starts_at).format('HH:mm')
-        this.model.until_time = moment(this.leave.leavedate_set[this.leave.leavedate_set.length - 1].ends_at).format('HH:mm')
+        this.$set(
+            this.model,
+            'id',
+            this.leave.id
+        );
+        this.$set(
+            this.model,
+            'description',
+            this.leave.description
+        );
+        this.$set(
+            this.model,
+            'leave_type',
+            this.leave.leave_type.id
+        );
+
+        const sortedLeaveDateSet = this.leave.leavedate_set.sort((a, b) => {
+          return moment(a.starts_at).diff(moment(b.starts_at))
+        })
+
+        this.$set(
+            this.model,
+            'timeFrom',
+            moment(sortedLeaveDateSet[0].starts_at).toDate()
+        );
+
+        this.$set(
+            this.model,
+            'timeTo',
+            moment(sortedLeaveDateSet[sortedLeaveDateSet.length - 1].ends_at).toDate()
+        );
       } else {
-        let date = this.date ? moment(this.date) : moment().add(1, 'days')
-
-        this.model.id = null
-        this.model.multiple_days = false
-        this.model.leave_type = store.getters.leave_types[0].id
-        this.model.description = null
-        this.model.start_date = moment(date)
-        this.model.end_date = moment(date)
-        this.model.date = moment(date)
-        this.model.from_time = '09:00'
-        const fromHours = model.from_time.split(":")
-        const toHour = Math.round(parseInt(fromHours[0])+model.workHours)
-        this.model.until_time = `${toHour < 10 ?`0${toHour}`:`${toHour}`}:${fromHours[1]}`
+        this.$set(this.model, 'id', null)
+        this.$set(this.model, 'leave_type', store.getters.leave_types?.[0]?.id)
+        this.$set(this.model, 'description', null)
+        this.$set(this.model, 'timeFrom', moment().set({hour: 9, minute: 0}).toDate())
+        this.$set(this.model, 'timeTo', moment().set({hour: 9 + this.workHours, minute: 0}).toDate())
       }
-
-      dateSet = false
-      startDateSet = false
-      endDateSet = false
     },
 
-    submit: function() {
+    async validate() {
+      if (this.model.leave_type === null) {
+        toastr.error('Please select leave type.')
+        return false
+      }
+
+      if (!isDate(this.model.timeFrom) || !isDate(this.model.timeTo)) {
+        toastr.error('Please select valid dates.')
+        return false
+      }
+
+      if (this.isMultipleDays) {
+        if (moment(this.model.timeFrom).isAfter(this.model.timeTo)) {
+          toastr.error('Start date cannot be after end date.')
+          return false
+        }
+      } else {
+        if (moment(this.model.timeFrom).isAfter(this.model.timeTo)) {
+          toastr.error('Start time cannot be after end time.')
+          return false
+        }
+      }
+
+      await this.setWorkingHoursForTheDate();
+
+      if (!this.isMultipleDays && this.isGreaterThanWorkHours) return false
+
+      return true
+    },
+
+    sendLeaveRequest(body) {
+      store.dispatch(types.NINETOFIVER_API_REQUEST, {
+        path: this.model.id ? `/leave/${this.model.id}/` : '/leave/',
+        method: this.model.id ? 'PUT' : 'POST',
+        body: body,
+      }).then((response) => {
+        this.$emit('success', response)
+        toastr.success('Leave requested.')
+        this.resetForm()
+      }).catch((error) => {
+        this.$emit('error', error)
+        toastr.error('Error requesting leave.')
+
+        try {
+          for (var key in error.data) {
+            error.data[key].forEach((err) => {
+              toastr.error(err.message)
+            })
+          }
+        } catch (err) {
+        }
+      }).finally(() => {
+        store.dispatch(types.NINETOFIVER_RELOAD_LEAVES);
+        this.loading = false
+      })
+    },
+
+    async getRangeInfo(start, end) {
+      return store.dispatch(types.NINETOFIVER_API_REQUEST, {
+        path: '/range_info/',
+        params: {
+          'from': start.format('YYYY-MM-DD'),
+          'until': end.format('YYYY-MM-DD'),
+          'daily': true,
+          'detailed': true
+        }
+      })
+    },
+
+    async submit() {
       if (this.loading) return
+      if (!(await this.validate())) return
+
       this.loading = true
 
       let body = {
@@ -178,265 +467,62 @@ export default {
       let dt_format = 'YYYY-MM-DDTHH:mm:00ZZ'
       let timezone = moment.tz.guess()
 
-      const send_leave_request = (body) => {
-        store.dispatch(types.NINETOFIVER_API_REQUEST, {
-          path: this.model.id ? `/leave/${this.model.id}/` : '/leave/',
-          method: this.model.id ? 'PUT' : 'POST',
-          body: body,
-        }).then((response) => {
-          this.$emit('success', response)
-          toastr.success('Leave requested.')
-          this.loading = false
-          this.resetForm()
-        }).catch((error) => {
-          this.$emit('error', error)
-          toastr.error('Error requesting leave.')
+      let start_date = moment(this.model.timeFrom)
+      let end_date = moment(this.model.timeTo)
 
-          try {
-            for (var key in error.data) {
-              error.data[key].forEach((err) => {
-                toastr.error(err.message)
-              })
-            }
-          } catch (err) {
-          }
-
-          this.loading = false
-        });
+      if (this.isMultipleDays) {
+        start_date = start_date.tz(timezone).startOf('date')
+        end_date = end_date.tz(timezone).endOf('date')
       }
 
-      if (this.model.multiple_days) {
-        let start_date = moment(this.model.start_date).tz(timezone).startOf('date')
-        let end_date = moment(this.model.end_date).tz(timezone).endOf('date')
+      body.full_day = this.isMultipleDays
+      body.starts_at = start_date.format(dt_format)
+      body.ends_at = end_date.format(dt_format)
 
-        body.full_day = true
-        body.starts_at = start_date.format(dt_format)
-        body.ends_at = end_date.format(dt_format)
-        // No need to check requested leave hours as this is calculated on the backend.
-        send_leave_request(body)
-      } else {
-        let from_time = moment(this.model.from_time, "HH:mm")
-        let until_time = moment(this.model.until_time, "HH:mm")
-
-        let start_date = moment(this.model.date).tz(timezone).hour(from_time.hour()).minute(from_time.minute()).second(0)
-        let end_date = moment(this.model.date).tz(timezone).hour(until_time.hour()).minute(until_time.minute()).second(0)
-
-        // Get contract hours
-        store.dispatch(types.NINETOFIVER_API_REQUEST, {
-          path: '/range_info/',
-          params: {
-            'from': start_date.format('YYYY-MM-DD'),
-            'until': end_date.format('YYYY-MM-DD'),
-            'daily': true,
-            'detailed': true
-          }
-        }).then(res => {
-          // Error if requesting more leave hours than contract working hours.
-          if (moment.duration(until_time.diff(from_time)) > res.data.work_hours * 60 * 60 * 1e3) {
-            this.$emit('error', res)
-            toastr.error('Cannot request leave for more hours than your contract hours.')
-            this.loading = false
-          }
-          // Send the request when requesting a correct amount of leave hours.
-          else {
-            body.full_day = false
-            body.starts_at = start_date.format(dt_format)
-            body.ends_at = end_date.format(dt_format)
-
-            send_leave_request(body)
-          }
-        })
-      }
+      this.sendLeaveRequest(body)
     },
 
-    remove: function() {
+    remove: function () {
       if (this.loading) return
       this.loading = true
 
       store.dispatch(types.NINETOFIVER_API_REQUEST, {
-          path: `/leave/${this.model.id}/`,
-          method: 'DELETE',
+        path: `/leave/${this.model.id}/`,
+        method: 'DELETE',
       }).then((response) => {
         this.$emit('success', response)
         toastr.success('Leave deleted.')
-        this.loading = false
         this.resetForm()
       }).catch((error) => {
         this.$emit('error', error)
         toastr.error('Error deleting leave.')
+      }).finally(() => {
         this.loading = false
-      });
-    },
-
-    isFutureLeave: function() {
-      return moment(this.model.multiple_days ? this.model.start_date : this.model.date).isAfter(moment(), 'day')
+        store.dispatch(types.NINETOFIVER_RELOAD_LEAVES);
+      })
     },
   },
-
-  data: () => {
-    return {
-      loading: false,
-
-      model: model,
-
-      schema: {
-        fields: [
-          {
-            type: "pikaday",
-            label: "Start date",
-            model: "start_date",
-            validator: [
-              VueFormGenerator.validators.date,
-              VueFormGenerator.validators.required
-            ],
-            pikadayOptions: {
-              position: "top left",
-              firstDay: 1,
-              onDraw: function(pikaday) {
-                if ((typeof model.start_date === 'object') && !startDateSet) {
-                  startDateSet = true
-                  pikaday.setDate(moment(model.start_date).toDate(), true)
-                }
-              },
-              onSelect: function(value) {
-                model.start_date = moment(value)
-
-                if (moment(value).isAfter(moment(model.end_date))) {
-                  model.end_date = moment(value)
-                  endDateSet = false
-                }
-              },
-            },
-            // visible: function(model) {
-            //   return model.multiple_days
-            // },
-            styleClasses: ['half-width-md', 'multiple-days-input']
-          },
-          {
-            type: "pikaday",
-            label: "End date",
-            model: "end_date",
-            validator: [
-              VueFormGenerator.validators.date,
-              VueFormGenerator.validators.required
-            ],
-            pikadayOptions: {
-              position: "top left",
-              firstDay: 1,
-              onDraw: function(pikaday) {
-                if (!pikaday._o.minDate || (moment(pikaday._o.minDate).format('YYYY-MM-DD') != moment(model.start_date).format('YYYY-MM-DD'))) {
-                  pikaday.setMinDate(moment(model.start_date).toDate())
-                }
-
-                if ((typeof model.end_date === 'object') && !endDateSet) {
-                  endDateSet = true
-                  pikaday.setDate(moment(model.end_date).toDate(), true)
-                }
-              },
-              onSelect: function(value) {
-                model.end_date = moment(value)
-
-                if (moment(value).isBefore(moment(model.start_date))) {
-                  model.start_date = moment(value)
-                  startDateSet = false
-                }
-              },
-            },
-            // visible: function(model) {
-            //   return model.multiple_days
-            // },
-            styleClasses: ['half-width-md', 'multiple-days-input']
-          },
-          {
-            type: "pikaday",
-            label: "Date",
-            model: "date",
-            validator: [
-              VueFormGenerator.validators.date,
-              VueFormGenerator.validators.required
-            ],
-            pikadayOptions: {
-              position: "top left",
-              firstDay: 1,
-              onDraw: function(pikaday) {
-                if ((typeof model.date === 'object') && !dateSet) {
-                  dateSet = true
-                  pikaday.setDate(moment(model.date).toDate(), true)
-                }
-              },
-            },
-            // visible: function(model) {
-            //   return !model.multiple_days
-            // },
-            styleClasses: ['third-width-md', 'single-day-input']
-          },
-          {
-            type: "select",
-            label: "From",
-            model: "from_time",
-            required: true,
-            validator: VueFormGenerator.validators.time,
-            values: utils.getTimeOptions().map(x => { return {id: x, name: x} }),
-            styleClasses: ['a-width-md', 'single-day-input']
-          },
-          {
-            type: "select",
-            label: "Until",
-            model: "until_time",
-            required: true,
-            validator: VueFormGenerator.validators.time,
-            values: utils.getTimeOptions().map(x => { return {id: x, name: x} }),
-            styleClasses: ['a-width-md', 'single-day-input'],
-          },
-          {
-            type: "textArea",
-            // label: "Description",
-            placeholder: "Description", 
-            model: "description",
-            max: 255,
-            rows: 2,
-            validator: VueFormGenerator.validators.string
-          },
-          {
-            type: "select",
-            label: "Type",
-            model: "leave_type",
-            required: true,
-            selectOptions: {
-              value: "id",
-              name: "display_label"
-            },
-            values: () => {
-              if (store.getters.leave_types) {
-                return store.getters.leave_types
-              }
-
-              return []
-            },
-            validator: VueFormGenerator.validators.required,
-          },
-          {
-            type: "submit",
-            buttonText: "Save",
-            styleClasses: ["d-none"],
-            validateBeforeSubmit: true,
-            onSubmit: () => {
-              submit()
-            }
-          }
-        ]
-      },
-
-      formOptions: {
-        validateAfterLoad: false,
-        validateAfterChanged: true
-      }
-    }
-  }
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
+@import "../../assets/scss/components/widgets";
+
+.card-body {
+  & .mx-datepicker {
+    width: 100%;
+  }
+
+  .alert {
+    font-size: 0.875rem;
+  }
+
+  button {
+    font-weight: 600;
+    justify-content: center;
+  }
+}
+
 .multiple-days {
   .single-day-input {
     display: none;
@@ -450,6 +536,6 @@ export default {
 }
 
 .btn {
-    height: 37px;
+  height: 37px;
 }
 </style>

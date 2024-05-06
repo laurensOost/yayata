@@ -1,0 +1,135 @@
+<script setup>
+import {
+  faPlane,
+  faChevronLeft,
+  faChevronRight,
+  faTemperatureThreeQuarters,
+  faTree
+} from "@fortawesome/free-solid-svg-icons";
+</script>
+
+<template lang="pug">
+  AgendaBlock(
+    color="success-soft"
+    :icon="faPlane"
+    :title="`Absences on ${formattedDate}`"
+  )
+    template(slot="header_end")
+      div(class="d-flex gx-1")
+        button(
+          class="btn btn-success-soft rounded-pill btn-sm btn-square text-success d-flex align-items-center"
+          @click="previousDay"
+        )
+          font-awesome-icon(:icon="faChevronLeft")
+        button(
+          class="btn btn-success-soft rounded-pill btn-sm btn-square text-success d-flex align-items-center"
+          @click="nextDay"
+        )
+          font-awesome-icon(:icon="faChevronRight")
+    div(class="d-flex flex-row flex-wrap g-3 agenda-block-body")
+      div(
+        v-if="absences.length !== 0"
+        v-for="user in absences"
+        :key="user.id"
+        class="d-flex align-items-center"
+      )
+        AgendaAvatar(:user="user" color="success" :tooltip="user.isSick ? 'Sick' : 'On leave'")
+          template(slot="icon")
+            font-awesome-icon(v-if="user.isSick" :icon="faTemperatureThreeQuarters")
+            font-awesome-icon(v-if="user.isOnLeave" :icon="faTree")
+      div(
+        v-if="absences.length === 0"
+        class="d-flex justify-content-center align-items-center w-100"
+      )
+        p(class="text-success no-absences m-0")
+          | No absences on {{ formattedDate }}
+</template>
+
+<script>
+import AgendaBlock from "./AgendaBlock.vue";
+import AgendaAvatar from "./AgendaAvatar.vue";
+import store from "../../../store";
+import moment from "moment";
+import {NINETOFIVER_RELOAD_USERS} from "../../../store/mutation-types";
+import * as types from "../../../store/mutation-types";
+import {toPairs} from "lodash";
+
+export default {
+  name: 'AgendaAbsenceBlock',
+  components: {
+    AgendaBlock,
+    AgendaAvatar,
+  },
+  data() {
+    return {
+      selectedDate: null,
+      absences: []
+    }
+  },
+  created() {
+    new Promise((resolve) => {
+      if (!store.getters.users) {
+        store.dispatch(NINETOFIVER_RELOAD_USERS).then(() => resolve())
+      } else {
+        resolve()
+      }
+    }).then(() => {
+      this.$set(this, 'selectedDate', moment())
+    })
+  },
+  watch: {
+    selectedDate() {
+      store.dispatch(types.NINETOFIVER_API_REQUEST, {
+        path: '/range_availability/',
+        params: {
+          from: this.selectedDate.format('YYYY-MM-DD'),
+          until: this.selectedDate.format('YYYY-MM-DD')
+        }
+      }).then((res) => {
+        this.absences = [];
+
+        if (!this.selectedDate && !res.data) return;
+
+        toPairs(res.data).forEach(([userId, availability]) => {
+          const currentDayAvailability = availability[this.selectedDate.format('YYYY-MM-DD')]
+
+          if (currentDayAvailability?.sickness.length || currentDayAvailability?.leave.length) {
+            const user = store.getters.users.find((user) => user.id === parseInt(userId));
+            this.absences.push({
+              ...user,
+              isSick: currentDayAvailability.sickness.length > 0,
+              isOnLeave: currentDayAvailability.leave.length > 0,
+            })
+          }
+        });
+      });
+    }
+  },
+  methods: {
+    previousDay() {
+      this.$set(this, 'selectedDate', moment(this.selectedDate).subtract(1, 'days'))
+    },
+    nextDay() {
+      this.$set(this, 'selectedDate', moment(this.selectedDate).add(1, 'days'))
+    },
+  },
+  computed: {
+    formattedDate() {
+      return this.selectedDate?.format('YYYY-MM-DD') ?? 'today'
+    },
+  }
+}
+</script>
+
+<style scoped lang="scss">
+@import "../../../assets/scss/bootstrap/variables";
+
+.agenda-block-body {
+  margin-left: 22px;
+}
+
+.no-absences {
+  font-size: 1rem;
+  color: $success;
+}
+</style>

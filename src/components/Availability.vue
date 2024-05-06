@@ -187,7 +187,6 @@ export default {
 
   computed: {
     countriesFilter: function() {
-      console.log(this.countries);
       return [
         {label: 'All', value: ''},
         ...this.countries.map(country => {

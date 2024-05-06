@@ -7,7 +7,7 @@ div(class='card card-top-blue mb-3')
     b-button(
       @click='submitTimesheet',
       :disabled='timesheet.status !== "active"',
-      :variant='timesheet.status === "active"?"primary":"secondary"'
+      :variant='timesheet.status === "active"?"primary":"inactive"'
       ref='timesheetSubmissionToggle'
     ) Submit timesheet
     b-badge(

@@ -1,9 +1,11 @@
+@import "_variables";
+
 each(range(10), {
   .gx-@{index} {
-    column-gap: 4px * @index;
+    column-gap: @default-gap * @index;
   }
 
   .gy-@{index} {
-      row-gap: 4px * @index;
+      row-gap: @default-gap * @index;
   }
 })

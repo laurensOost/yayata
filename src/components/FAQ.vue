@@ -17,7 +17,7 @@ div
           block
           href='#'
           v-b-toggle='"ical-feed"'
-          variant='info'
+          variant='primary'
           class='white-space-normal'
         ) How do I access leave or whereabouts as an iCal feed for use in Thunderbird, Google Calendar, Zimbra, etc.?
       b-collapse(
@@ -68,7 +68,7 @@ div
           block
           href='#'
           v-b-toggle='"open-source"'
-          variant='info'
+          variant='primary'
           class='white-space-normal'
         ) I've heard YAYATA is open source software. Where can I get involved?
       b-collapse(
@@ -95,7 +95,7 @@ div
           block
           href='#'
           v-b-toggle='"change-gravatar"'
-          variant='info'
+          variant='primary'
           class='white-space-normal'
         ) How do I change the avatar on my profile page?
       b-collapse(
@@ -121,7 +121,7 @@ div
           block
           href='#'
           v-b-toggle='"other-questions"'
-          variant='info'
+          variant='primary'
           class='white-space-normal'
         ) I have a question that isn't answered here. What should I do?
       b-collapse(

@@ -1,0 +1,21 @@
+@import "bootstrap/scss/variables";
+
+@mixin rounded($coefficient: 1, $side: all, $radius: $border-radius) {
+  @if $side == all {
+    border-radius: $radius * $coefficient;
+  } @else {
+    @if $side == top {
+      border-top-left-radius: $radius * $coefficient;
+      border-top-right-radius: $radius * $coefficient;
+    } @else if $side == bottom {
+      border-bottom-left-radius: $radius * $coefficient;
+      border-bottom-right-radius: $radius * $coefficient;
+    } @else if $side == left {
+      border-top-left-radius: $radius * $coefficient;
+      border-bottom-left-radius: $radius * $coefficient;
+    } @else if $side == right {
+      border-top-right-radius: $radius * $coefficient;
+      border-bottom-right-radius: $radius * $coefficient;
+    }
+  }
+}

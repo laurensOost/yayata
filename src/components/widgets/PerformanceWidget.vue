@@ -1,89 +1,226 @@
 <template lang="pug">
-.card.card-top-blue.mb-3(v-on:keyup.enter="submit")
-  .card-header.text-center ⏳&nbsp;
-    span(v-if="!model.id") Log performance
-    span(v-else) Update performance
-    span(v-if="model.date") &nbsp;for {{ model.date | moment("ddd, MMMM Do") }}
+  div(class='card widget-card widget-px widget-py shadow-sm mb-3')
+    div(class="card-header mb-3 p-0")
+      | Log performance
+    div(class="card-body d-flex flex-column" v-on:keyup.enter="submit")
+      div(class="form-group mb-2")
+        label(for='contract') Contract
+        multiselect(
+          v-model="model.contract",
+          :options="contractValues",
+          :allowEmpty="false",
+          track-by="id",
+          :disabled="loading",
+          label='display_label',
+          id='contract',
+          @select="handleContractChange"
+        )
 
-  .card-body
-    vue-form-generator(
-      :schema="schema",
-      :model="model",
-      :options="formOptions",
-      ref="form"
-    )
-
-    .form-group.my-0
-      .row.justify-content-between
-        .col
-          input.btn.btn-primary(
-            type="submit",
-            value="Save",
-            @click="submit()",
-            ref="submitButton"
+      div(class='d-flex gx-3 mb-2')
+        div(class='form-group m-0 w-50')
+          label(for='duration') Duration
+          input(
+            v-model="model.duration",
+            type='text',
+            class='form-control',
+            id='duration',
+            :disabled="loading",
+            required='required',
+            pattern="^([0-9]{1,2}(?:(?::[0-9]{2})?(?:[\\.,][0-9]{1,2})?)?)$",
           )
-        .col-auto(v-if="model.id")
-          input.btn.btn-danger(
-            type="submit",
-            value="Delete",
+        div(class='form-group m-0 w-50')
+          label(for='performance_type') Type
+          b-form-select(
+            v-model="model.performance_type"
+            :options="performanceTypeValues",
+            class='form-control',
+            id='performance_type',
+            required='required',
+            :disabled="loading",
+            text-field="display_label",
+            value-field="id",
+          )
+            template(v-slot:first)
+              b-form-select-option(:value='null' disabled)
+                | < Nothing selected >
+
+      div(class='form-group mb-2')
+        label(for='description') Description
+        textarea(
+          v-model="model.description",
+          class='form-control',
+          id='description',
+          rows='3',
+          :disabled="loading",
+          maxlength='2048',
+        )
+        small(class='form-text text-muted text-right') {{ descriptionLength }} / 2048
+
+      div(class='flex-grow-1')
+
+      div(class='d-flex align-items-end')
+        div(class='w-50')
+          div(class='form-group w-auto mb-0')
+            label(for='role') Role
+            b-form-select(
+              v-model="model.contract_role",
+              :options="rolesValues",
+              class='form-control',
+              id='role',
+              required='required',
+              :disabled="loading",
+              text-field="display_label",
+              value-field="id",
+            )
+              template(v-slot:first)
+                b-form-select-option(:value='null' disabled)
+                  | < Nothing selected >
+
+        div(class='w-50 d-flex justify-content-end align-items-end gx-2')
+          button(
+            v-if="model.id",
+            type='submit',
+            class='btn btn-danger-soft text-danger',
+            :disabled="loading",
             @click="remove()"
-          )
+          ) delete
+          button(
+            type='submit',
+            class='btn btn-primary-soft text-primary',
+            :disabled="loading",
+            @click="submit()",
+          ) log time
+
 </template>
 
 <script>
 import moment from "moment";
-import VueFormGenerator from "vue-form-generator";
 import toastr from "toastr";
 import utils from "../../utils";
 import * as types from "../../store/mutation-types";
 import store from "../../store";
 import preferences from "../../preferences";
-
-var model = {
-  id: null,
-  date: null,
-  contract: null,
-  contract_role: null,
-  performance_type: null,
-  duration: null,
-  description: null,
-};
-var submit = null;
+import {isEmpty, isNull, isString} from "lodash";
+import {EventBus} from "../../utils/event-bus";
 
 export default {
   name: "PerformanceWidget",
 
-  mixins: [],
-
   props: ["performance", "date", "duration"],
 
-  created: function () {
-    submit = this.submit;
+  data: () => ({
+    loading: false,
 
+    model: {
+      id: null,
+      date: null,
+      contract: null,
+      contract_role: null,
+      performance_type: null,
+      duration: null,
+      description: null,
+    },
+  }),
+
+  computed: {
+    descriptionLength() {
+      return this.model.description?.length ?? 0;
+    },
+
+    contractValues() {
+      if (store.getters.active_contracts) {
+        let contracts = {};
+        let final = [];
+        for (
+            let i = 0;
+            i < store.getters.active_contracts.length;
+            i++
+        ) {
+          const element = store.getters.active_contracts[i];
+          if (!contracts[element.display_label]) {
+            contracts[element.display_label] = [];
+          }
+          contracts[element.display_label].push(element);
+        }
+
+        const ordered = Object.keys(contracts)
+            .sort((a, b) => a.localeCompare(b, undefined, {
+              numeric: true
+            }))
+            .reduce((object, key) => {
+              object[key] = contracts[key];
+              return object;
+            }, {});
+        for (let i = 0; i < Object.keys(ordered).length; i++) {
+          const list = ordered[Object.keys(ordered)[i]];
+          final = final.concat(
+              list.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}))
+          );
+        }
+        return final
+      }
+
+      return [];
+    },
+
+    performanceTypeValues() {
+      if (!store.getters.active_contracts || !store.getters.performance_types || !this.model.contract)
+        return [];
+
+      let contract = store.getters.active_contracts.find(
+          (contract) => contract.id === this.model.contract.id
+      );
+
+      if (contract) {
+        if (
+            contract.performance_types &&
+            contract.performance_types.length
+        ) {
+          return contract.performance_types;
+        }
+
+        return store.getters.performance_types;
+      }
+    },
+
+    rolesValues() {
+      if (!store.getters.contract_users || !this.model.contract)
+        return [];
+
+      return store.getters.contract_users
+          .filter(
+              (contract_user) =>
+                  contract_user.contract.id === this.model.contract.id
+          )
+          .map((contract_user) => contract_user.contract_role);
+    }
+  },
+
+  created: function () {
     Promise.all([
-      new Promise((resolve, reject) => {
+      new Promise((resolve) => {
         if (!store.getters.performance_types) {
           store
-            .dispatch(types.NINETOFIVER_RELOAD_PERFORMANCE_TYPES)
-            .then(() => resolve());
+              .dispatch(types.NINETOFIVER_RELOAD_PERFORMANCE_TYPES)
+              .then(() => resolve());
         } else {
           resolve();
         }
       }),
-      new Promise((resolve, reject) => {
+      new Promise((resolve) => {
         if (!store.getters.contract_users) {
           store
-            .dispatch(types.NINETOFIVER_RELOAD_CONTRACT_USERS)
-            .then(() => resolve());
+              .dispatch(types.NINETOFIVER_RELOAD_CONTRACT_USERS)
+              .then(() => resolve());
         } else {
           resolve();
         }
       }),
-      new Promise((resolve, reject) => {
+      new Promise((resolve) => {
         if (!store.getters.active_contracts) {
           store
-            .dispatch(types.NINETOFIVER_RELOAD_CONTRACTS)
-            .then(() => resolve());
+              .dispatch(types.NINETOFIVER_RELOAD_CONTRACTS)
+              .then(() => resolve());
         } else {
           resolve();
         }
@@ -93,51 +230,52 @@ export default {
     });
   },
 
-  mounted: function () {
-    setTimeout(() => {
-      this.$refs.submitButton.focus();
-    });
-  },
-
   methods: {
-    resetForm: function () {
-      let contract_field = this.schema.fields.find(
-        (f) => f.model == "contract"
-      );
-      contract_field.set = contract_field.set.bind(this);
+    handleContractChange() {
+      this.$set(this.model, "performance_type", this.performanceTypeValues?.[0]?.id);
+      this.$set(this.model, "contract_role", this.rolesValues?.[0]?.id);
+    },
 
+    resetForm: function () {
       if (this.performance) {
-        this.model.id = this.performance.id;
-        this.model.performance_type = this.performance.performance_type.id;
-        this.model.contract_role = this.performance.contract_role.id;
-        this.model.contract = this.performance.contract.id;
-        this.model.date = this.performance.date;
-        this.model.duration = this.performance.duration;
-        this.model.description = this.performance.description;
+        this.$set(this.model, "id", this.performance.id);
+        this.$set(this.model, "performance_type", this.performance.performance_type.id);
+        this.$set(this.model, "contract_role", this.performance.contract_role.id);
+        this.$set(this.model, "contract", this.performance.contract);
+        this.$set(this.model, "date", this.performance.date);
+        this.$set(this.model, "duration", this.performance.duration);
+        this.$set(this.model, "description", this.performance.description);
       } else {
-        this.model.id = null;
+        this.$set(this.model, "id", null);
 
         // Attempt to set saved selected contract as selected contract
-        let contractIds = contract_field.values.call(this).map((x) => x.id);
         let selectedContractId = preferences.get(
-          preferences.key.PERFORMANCE_SELECTED_CONTRACT_ID
+            preferences.key.PERFORMANCE_SELECTED_CONTRACT_ID
         );
-        let contractId =
-          selectedContractId && contractIds.indexOf(selectedContractId) !== -1
-            ? selectedContractId
-            : contractIds[0];
-        contract_field.set(this.model, contractId);
+        this.$set(
+            this.model,
+            "contract",
+            this.contractValues?.find((contract) => contract.id === selectedContractId) ?? this.contractValues[0],
+        );
 
-        this.model.date = this.date
-          ? moment(this.date)
-          : moment().format("YYYY-MM-DD");
-        this.model.duration = this.duration ? this.duration : 1;
-        this.model.description = null;
+        this.handleContractChange();
+
+        this.$set(
+            this.model,
+            "date",
+            this.date
+                ? moment(this.date)
+                : moment().format("YYYY-MM-DD")
+        );
+        this.$set(
+            this.model,
+            "duration",
+            this.duration ? this.duration : 1
+        );
+        this.$set(this.model, "description", null);
       }
 
-      this.model.duration = (
-        Math.round(this.model.duration * 100) / 100
-      ).toString();
+      this.$set(this.model, "duration", `${Math.round(this.model.duration * 100) / 100}`);
     },
 
     remove: function () {
@@ -145,25 +283,40 @@ export default {
       this.loading = true;
 
       store
-        .dispatch(types.NINETOFIVER_API_REQUEST, {
-          path: `/performances/${this.model.id}/`,
-          method: "DELETE",
-        })
-        .then((response) => {
-          this.$emit("success", response);
-          toastr.success("Performance deleted.");
-          this.loading = false;
-          this.resetForm();
-        })
-        .catch((error) => {
-          this.$emit("error", error);
-          toastr.error("Error deleting performance.");
-          this.loading = false;
-        });
+          .dispatch(types.NINETOFIVER_API_REQUEST, {
+            path: `/performances/${this.model.id}/`,
+            method: "DELETE",
+          })
+          .then((response) => {
+            this.$emit("success", response);
+            toastr.success("Performance deleted.");
+            this.loading = false;
+            this.resetForm();
+          })
+          .catch((error) => {
+            this.$emit("error", error);
+            toastr.error("Error deleting performance.");
+            this.loading = false;
+          });
     },
 
     validate: function () {
-      if (!utils.validateDuration(this.model.duration)) {
+      if (isNull(this.model.contract)) {
+        toastr.error("Contract is required.");
+        return false;
+      }
+
+      if (isNull(this.model.performance_type)) {
+        toastr.error("Performance type is required.");
+        return false;
+      }
+
+      if (isNull(this.model.contract_role)) {
+        toastr.error("Role is required.");
+        return false;
+      }
+
+      if (isEmpty(this.model.duration) || !utils.validateDuration(this.model.duration) || !isString(this.model.duration)) {
         toastr.error("Invalid duration provided.");
         return false;
       }
@@ -171,7 +324,7 @@ export default {
       return true;
     },
 
-    submit: function(event) {
+    submit: function (event) {
       if (this.loading) return
       if (!this.validate()) return
       if (event && (event.target.tagName !== 'INPUT' || event.type === "keyup")) return
@@ -183,7 +336,7 @@ export default {
         duration: utils.transformDuration(this.model.duration),
         description: this.model.description,
         performance_type: this.model.performance_type,
-        contract: this.model.contract,
+        contract: this.model.contract.id,
         contract_role: this.model.contract_role,
         type: "ActivityPerformance",
       };
@@ -191,220 +344,57 @@ export default {
       if (!this.model.id) {
         // Save last selected contract ID so we can select it upon logging new performance
         preferences.set(
-          preferences.key.PERFORMANCE_SELECTED_CONTRACT_ID,
-          body.contract
+            preferences.key.PERFORMANCE_SELECTED_CONTRACT_ID,
+            body.contract,
         );
 
         store
-          .dispatch(types.NINETOFIVER_API_REQUEST, {
-            path: "/performances/",
-            method: "POST",
-            body: body,
-          })
-          .then((response) => {
-            this.$emit("success", response);
-            toastr.success("Performance logged.");
-            this.loading = false;
-            this.resetForm();
-          })
-          .catch((error) => {
-            this.$emit("error", error);
-            toastr.error("Error saving performance.");
-            this.loading = false;
-          });
+            .dispatch(types.NINETOFIVER_API_REQUEST, {
+              path: "/performances/",
+              method: "POST",
+              body: body,
+            })
+            .then((response) => {
+              this.$emit("success", response);
+              toastr.success("Performance logged.");
+              this.loading = false;
+              this.resetForm();
+              EventBus.$emit("performance:logged");
+            })
+            .catch((error) => {
+              this.$emit("error", error);
+              toastr.error("Error saving performance.");
+              this.loading = false;
+            });
       } else {
         store
-          .dispatch(types.NINETOFIVER_API_REQUEST, {
-            path: `/performances/${this.model.id}/`,
-            method: "PUT",
-            body: body,
-          })
-          .then((response) => {
-            this.$emit("success", response);
-            toastr.success("Performance updated.");
-            this.loading = false;
-          })
-          .catch((error) => {
-            this.$emit("error", error);
-            toastr.error("Error updating performance.");
-            this.loading = false;
-          });
+            .dispatch(types.NINETOFIVER_API_REQUEST, {
+              path: `/performances/${this.model.id}/`,
+              method: "PUT",
+              body: body,
+            })
+            .then((response) => {
+              this.$emit("success", response);
+              toastr.success("Performance updated.");
+              this.loading = false;
+            })
+            .catch((error) => {
+              this.$emit("error", error);
+              toastr.error("Error updating performance.");
+              this.loading = false;
+            });
       }
     },
-  },
-
-  data: () => {
-    return {
-      loading: false,
-
-      model: model,
-
-      schema: {
-        fields: [
-          {
-            type: "vueMultiSelect",
-            label: "Contract",
-            model: "contract",
-            required: true,
-            selectOptions: {
-              key: "id",
-              label: "display_label",
-              trackBy: "id",
-              showLabels: false,
-              allowEmpty: false,
-            },
-            values: function () {
-              if (store.getters.active_contracts) {
-                let contracts = {};
-                let final = [];
-                for (
-                  let i = 0;
-                  i < store.getters.active_contracts.length;
-                  i++
-                ) {
-                  const element = store.getters.active_contracts[i];
-                  if (!contracts[element.display_label]) {
-                    contracts[element.display_label] = [];
-                  }
-                  contracts[element.display_label].push(element);
-                }
-
-                const ordered = Object.keys(contracts)
-                  .sort((a,b)=>a.localeCompare(b,undefined,{
-                    numeric:true
-                  }))
-                  .reduce((object, key) => {
-                    object[key] = contracts[key];
-                    return object;
-                  }, {});
-                for (let i = 0; i < Object.keys(ordered).length; i++) {
-                  const list = ordered[Object.keys(ordered)[i]];
-                  final = final.concat(
-                    list.sort((a, b) => a.name.localeCompare(b.name,undefined,{numeric: true}))
-                  );
-                }
-                return final
-              }
-
-              return [];
-            },
-            validator: VueFormGenerator.validators.required,
-            // styleClasses: ['half-width-md'],
-            get: function () {
-              if (store.getters.active_contracts) {
-                return store.getters.active_contracts.find(
-                  (contract) => contract.id == model.contract
-                );
-              }
-            },
-            set: function (model, value) {
-              this.model.contract = value.id ? value.id : value;
-              this.model.performance_type = this.schema.fields
-                .find((f) => f.model == "performance_type")
-                .values.call(this)[0].id;
-              this.model.contract_role = this.schema.fields
-                .find((f) => f.model == "contract_role")
-                .values.call(this)[0].id;
-            },
-          },
-          {
-            type: "input",
-            inputType: "text",
-            label: "Duration (hours)",
-            model: "duration",
-            required: true,
-            pattern: "^([0-9]{1,2}(?:(?::[0-9]{2})?(?:[\\.,][0-9]{1,2})?)?)$",
-            validator: VueFormGenerator.validators.string,
-            styleClasses: ["third-width-md"],
-          },
-          {
-            type: "select",
-            label: "Type",
-            model: "performance_type",
-            required: true,
-            selectOptions: {
-              value: "id",
-              name: "display_label",
-            },
-            values: function () {
-              if (
-                store.getters.active_contracts &&
-                store.getters.performance_types &&
-                this.model.contract
-              ) {
-                let contract = store.getters.active_contracts.find(
-                  (contract) => contract.id == this.model.contract
-                );
-
-                if (contract) {
-                  if (
-                    contract.performance_types &&
-                    contract.performance_types.length
-                  ) {
-                    return contract.performance_types;
-                  }
-
-                  return store.getters.performance_types;
-                }
-              }
-
-              return [];
-            },
-            validator: VueFormGenerator.validators.required,
-            styleClasses: ["third-width-md"],
-          },
-          {
-            type: "select",
-            label: "Role",
-            model: "contract_role",
-            required: true,
-            selectOptions: {
-              value: "id",
-              name: "display_label",
-            },
-            values: function () {
-              if (store.getters.contract_users && this.model.contract) {
-                return store.getters.contract_users
-                  .filter(
-                    (contract_user) =>
-                      contract_user.contract.id == this.model.contract
-                  )
-                  .map((contract_user) => contract_user.contract_role);
-              }
-
-              return [];
-            },
-            validator: VueFormGenerator.validators.required,
-            styleClasses: ["third-width-md"],
-          },
-          {
-            type: "textArea",
-            label: "Description",
-            model: "description",
-            max: 2048,
-            rows: 2,
-            validator: VueFormGenerator.validators.string,
-          },
-          {
-            type: "submit",
-            buttonText: "Save",
-            validateBeforeSubmit: true,
-            styleClasses: ["d-none"],
-            onSubmit: () => {
-              submit();
-            },
-          },
-        ],
-      },
-
-      formOptions: {
-        validateAfterLoad: false,
-        validateAfterChanged: true,
-      },
-    };
   },
 };
 </script>
 
-<style lang="less">
+<style scoped lang="scss">
+@import "../../assets/scss/components/widgets";
+
+.card-body {
+  button {
+    font-weight: 600;
+  }
+}
 </style>
