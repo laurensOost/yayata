@@ -45,6 +45,7 @@ export default {
 
 .agenda-block {
   width: 100%;
+  height: 100%;
   padding: 12px 16px;
 
   .agenda-header {

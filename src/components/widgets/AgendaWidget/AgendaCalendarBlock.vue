@@ -3,16 +3,17 @@ import {faCalendarDay} from "@fortawesome/free-solid-svg-icons";
 </script>
 
 <template lang="pug">
-  AgendaBlock(
-    color="primary-soft"
-    :icon="faCalendarDay"
-    title="Calendar"
-  )
-    div(class="d-flex align-items-center flex-column calendar-body")
-      p {{ dayOfTheWeek }}
-      p {{ dayOfTheMonth }}
-      p {{ shortMonth }}
-      p {{ year }}
+  div(class='col')
+    AgendaBlock(
+      color="primary-soft"
+      :icon="faCalendarDay"
+      title="Calendar"
+    )
+      div(class="d-flex align-items-center flex-column calendar-body")
+        p {{ dayOfTheWeek }}
+        p {{ dayOfTheMonth }}
+        p {{ shortMonth }}
+        p {{ year }}
 </template>
 
 <script>

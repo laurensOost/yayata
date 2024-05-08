@@ -3,37 +3,37 @@ import {faCalendarCheck, faArrowUp} from "@fortawesome/free-solid-svg-icons";
 </script>
 
 <template lang="pug">
-  AgendaBlock(
-    color="info-soft"
-    :icon="faCalendarCheck"
-    title="Events"
-    :style="{flexGrow: 1}"
-    v-if="events.length"
-  )
-    div(class="d-flex align-items-start flex-column gy-1 agenda-block-body")
-      div(
-        v-for="event in events"
-        :key="event.id"
-        class="d-flex flex-row align-items-start w-100 event-row"
-      )
+  div(class='col' v-if="events.length")
+    AgendaBlock(
+      color="info-soft"
+      :icon="faCalendarCheck"
+      title="Events"
+      :style="{flexGrow: 1}"
+    )
+      div(class="d-flex align-items-start flex-column gy-1 agenda-block-body")
         div(
-          v-if="event.is_running"
-          :title="event.is_running ? 'Event is running' : 'Event is not running'"
-          class="live"
-          v-b-tooltip.hover.top="{ boundary: 'window', variant: 'primary' }"
-          )
-        div(class="d-flex flex-column flex-grow-1 info")
-          p {{ event.display_label }}
-          p {{ getEventDateString(event) }}
-          p(v-if="event.location") {{ event.location.display_label }}
-
-        a(
-          v-if="event.link"
-          :href="event.link"
-          target="_blank"
-          class="btn btn-info rounded-pill btn-sm btn-square text-info-soft d-flex align-items-center"
+          v-for="event in events"
+          :key="event.id"
+          class="d-flex flex-row align-items-start w-100 event-row"
         )
-          font-awesome-icon(:icon='faArrowUp' :style="{'aspect-ratio': '1/1', transform: 'rotate(45deg)'}" )
+          div(
+            v-if="event.is_running"
+            :title="event.is_running ? 'Event is running' : 'Event is not running'"
+            class="live"
+            v-b-tooltip.hover.top="{ boundary: 'window', variant: 'primary' }"
+            )
+          div(class="d-flex flex-column flex-grow-1 info")
+            p {{ event.display_label }}
+            p {{ getEventDateString(event) }}
+            p(v-if="event.location") {{ event.location }}
+
+          a(
+            v-if="event.link"
+            :href="event.link"
+            target="_blank"
+            class="btn btn-info rounded-pill btn-sm btn-square text-info-soft d-flex align-items-center"
+          )
+            font-awesome-icon(:icon='faArrowUp' :style="{'aspect-ratio': '1/1', transform: 'rotate(45deg)'}" )
 </template>
 
 <script>
@@ -48,14 +48,6 @@ import * as types from "../../../store/mutation-types";
  */
 
 /**
- * @typedef Location
- * @type {object}
- * @property {string} display_label
- * @property {'Location'} type
- * @property {string} name
- */
-
-/**
  * @typedef Event
  * @type {object}
  * @property {number} id
@@ -63,7 +55,7 @@ import * as types from "../../../store/mutation-types";
  * @property {string} name
  * @property {string} display_label
  * @property {string | null} link
- * @property {Location | null} location
+ * @property {string | null} location
  * @property {boolean} is_running
  * @property {`${Digit}${Digit}${Digit}${Digit}-${Digit}${Digit}-${Digit}${Digit}`} starts_at
  * @property {`${Digit}${Digit}${Digit}${Digit}-${Digit}${Digit}-${Digit}${Digit}`} ends_at

@@ -4,6 +4,12 @@ div
     div(class='col')
       DueTimesheetWarningWidget
 
+  div(class='row mb-3')
+      AgendaQuoteBlock
+      AgendaEventsBlock
+      AgendaBirthdayBlock
+      AgendaCalendarBlock
+
   div(class='row statistics full-height mb-3')
     div(class='col-xl-3')
       WorkSummaryWidget(v-if='timesheet' :timesheet='timesheet')
@@ -18,7 +24,7 @@ div
       LeaveWidget
 
     div(class='col-xl-6')
-      AgendaWidget
+      AbsenceWidget
 </template>
 
 <script>
@@ -30,7 +36,11 @@ import LeaveWidget from './widgets/LeaveWidget.vue';
 import LeavesWidget from "./widgets/LeavesWidget/LeavesWidget.vue";
 import ContractsChartWidget from "./widgets/Charts/ContractsChartWidget.vue";
 import WorkSummaryWidget from "./widgets/Charts/WorkSummaryWidget.vue";
-import AgendaWidget from "./widgets/AgendaWidget/AgendaWidget.vue";
+import AgendaQuoteBlock from "./widgets/AgendaWidget/AgendaQuoteBlock.vue";
+import AgendaEventsBlock from "./widgets/AgendaWidget/AgendaEventsBlock.vue";
+import AgendaBirthdayBlock from "./widgets/AgendaWidget/AgendaBirthdayBlock.vue";
+import AgendaCalendarBlock from "./widgets/AgendaWidget/AgendaCalendarBlock.vue";
+import AbsenceWidget from "./widgets/AbsenceWidget.vue";
 
 
 export default {
@@ -51,7 +61,11 @@ export default {
   },
 
   components: {
-    AgendaWidget,
+    AbsenceWidget,
+    AgendaCalendarBlock,
+    AgendaBirthdayBlock,
+    AgendaEventsBlock,
+    AgendaQuoteBlock,
     LeavesWidget,
     PerformanceWidget,
     DueTimesheetWarningWidget,

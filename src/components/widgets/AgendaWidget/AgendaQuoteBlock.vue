@@ -3,15 +3,15 @@ import {faQuoteLeft} from "@fortawesome/free-solid-svg-icons";
 </script>
 
 <template lang="pug">
-  AgendaBlock(
-    color="secondary-soft"
-    :icon="faQuoteLeft"
-    title="Quote of the day"
-    v-if="quote"
-  )
-    div(class="d-flex align-items-start flex-column gy-1 agenda-block-body")
-      p {{ quoteText }}
-      p {{ author }}
+  div(class='col' v-if="quote")
+    AgendaBlock(
+      color="secondary-soft"
+      :icon="faQuoteLeft"
+      title="Quote of the day"
+    )
+      div(class="d-flex align-items-start flex-column gy-1 agenda-block-body")
+        p {{ quoteText }}
+        p {{ author }}
 </template>
 
 <script>

@@ -3,23 +3,24 @@ import {faGift} from "@fortawesome/free-solid-svg-icons";
 </script>
 
 <template lang="pug">
-  AgendaBlock(
-    color="danger-soft"
-    :icon="faGift"
-    title="Month birthdays"
-    :style="{flexGrow: 1}"
-  )
-    div(class="d-flex align-items-start flex-column gy-1 agenda-block-body")
-      div(
-        v-for="user in birthdayUsers"
-        :key="user.id"
-        class="d-flex align-items-center"
-        :title="getTitleUserString(user)"
-      )
-        AgendaAvatar(:user="user" color="danger")
-          template(slot="info")
-            p(class="text-muted m-0")
-              | {{ getUserRelativeBirthdayString(user) }}
+  div(class='col')
+    AgendaBlock(
+      color="danger-soft"
+      :icon="faGift"
+      title="Month birthdays"
+      :style="{flexGrow: 1}"
+    )
+      div(class="d-flex align-items-start flex-column gy-1 agenda-block-body")
+        div(
+          v-for="user in birthdayUsers"
+          :key="user.id"
+          class="d-flex align-items-center"
+          :title="getTitleUserString(user)"
+        )
+          AgendaAvatar(:user="user" color="danger")
+            template(slot="info")
+              p(class="text-muted m-0")
+                | {{ getUserRelativeBirthdayString(user) }}
 </template>
 
 <script>

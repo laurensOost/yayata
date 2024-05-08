@@ -1,156 +1,131 @@
+<script setup>
+import {
+  faChevronLeft,
+  faChevronRight,
+  faTemperatureThreeQuarters,
+  faTree
+} from "@fortawesome/free-solid-svg-icons";
+</script>
 <template lang="pug">
-div(class='card card-top-blue mb-3')
-  div(class='card-header text-center d-flex justify-content-between')
-    span(title='Go to previous day')
-      i(class='fa fa-chevron-left chevron' @click='dayEarlier')
-    | 😷🌴 Absences for {{ selectedDay | moment('ddd, MMMM Do') }}
-    span(title='Go to next day')
-      i(class='fa fa-chevron-right chevron' @click='dayLater')
-
-  div(class='row justify-content-center m-0 p-1' v-if='absentUsers.length')
-    div(v-for='(user, index) in absentUsers')
-      i( :class="user.absenceIcon" class="dist-icon" v-b-tooltip.left :title="user.absenceType")
-      i(v-if="user['absenceType'] == 'Other'" :class="user.fullDay" v-b-tooltip.left :title="user.dayTooltip" class="dist-icon-more")
-      ColleagueAvatarWidget(
-        v-bind:key='user.id'
-        :user='user'
-        size='64'
-        class='col-auto p-1'
+div(class='card widget-card widget-px widget-py shadow-sm mb-3')
+  div(class="card-header d-flex flex-row align-items-center mb-3 p-0")
+    span Absences on {{ formattedDate }}
+    div(class='flex-grow-1')
+    div(class="d-flex gx-1")
+      button(
+        class="btn btn-success-soft rounded-pill btn-sm btn-square text-success d-flex align-items-center"
+        @click="previousDay"
       )
-
-  table(class='table my-0' v-if='holidays.length')
-    tbody
-      tr(v-for='holiday in holidays')
-        td 🌐 {{ holiday.display_label }}
-        td(class='text-right') {{ holiday.country }}
-
-  div(class='card-body text-center' v-if='!holidays.length && !absentUsers.length') Everyone's present! 🙂
+        font-awesome-icon(:icon="faChevronLeft")
+      button(
+        class="btn btn-success-soft rounded-pill btn-sm btn-square text-success d-flex align-items-center"
+        @click="nextDay"
+      )
+        font-awesome-icon(:icon="faChevronRight")
+  div(class='card-body')
+    div(class="d-flex flex-row flex-wrap g-3 agenda-block-body")
+      div(
+        v-if="absences.length !== 0"
+        v-for="user in absences"
+        :key="user.id"
+        class="d-flex align-items-center"
+      )
+        AgendaAvatar(:user="user" color="success" :tooltip="user.isSick ? 'Sick' : 'On leave'")
+          template(slot="icon")
+            font-awesome-icon(v-if="user.isSick" :icon="faTemperatureThreeQuarters")
+            font-awesome-icon(v-if="user.isOnLeave" :icon="faTree")
+      div(
+        v-if="absences.length === 0"
+        class="d-flex justify-content-center align-items-center w-100"
+      )
+        p(class="text-success no-absences m-0")
+          | No absences on {{ formattedDate }}
 </template>
 
 <script>
 import moment from 'moment';
 import * as types from '../../store/mutation-types';
 import store from '../../store';
-import ColleagueAvatarWidget from './ColleagueAvatarWidget.vue';
+import AgendaBlock from "./AgendaWidget/AgendaBlock.vue";
+import AgendaAvatar from "./AgendaWidget/AgendaAvatar.vue";
+import {NINETOFIVER_RELOAD_USERS} from "../../store/mutation-types";
+import {toPairs} from "lodash";
 
 export default {
   name: 'AbsenceWidget',
-
   components: {
-    ColleagueAvatarWidget
+    AgendaBlock,
+    AgendaAvatar,
   },
-
   data () {
     return {
-      selectedDay: null,
-      absentUsers: [],
-      holidays: []
+      selectedDate: null,
+      absences: []
     }
   },
-
-  created: function() {
-    new Promise((resolve, reject) => {
+  computed: {
+    formattedDate() {
+      return this.selectedDate?.format('YYYY-MM-DD') ?? 'today'
+    },
+  },
+  created() {
+    new Promise((resolve) => {
       if (!store.getters.users) {
-        store.dispatch(types.NINETOFIVER_RELOAD_USERS).then(() => resolve())
-      } else{
+        store.dispatch(NINETOFIVER_RELOAD_USERS).then(() => resolve())
+      } else {
         resolve()
       }
     }).then(() => {
-      this.selectedDay = moment()
+      this.$set(this, 'selectedDate', moment())
     })
   },
 
-  methods: {
-    dayEarlier: function() {
-      let orig = this.selectedDay
-      orig.subtract(1, 'days')
-      this.selectedDay = null
-      this.selectedDay = orig
-    },
-
-    dayLater: function() {
-      let orig = this.selectedDay
-      orig.add(1, 'days')
-      this.selectedDay = null
-      this.selectedDay = orig
-    },
-  },
-
   watch: {
-    selectedDay: function() {
+    selectedDate() {
       store.dispatch(types.NINETOFIVER_API_REQUEST, {
         path: '/range_availability/',
         params: {
-          from: this.selectedDay.format('YYYY-MM-DD'),
-          until: this.selectedDay.format('YYYY-MM-DD')
+          from: this.selectedDate.format('YYYY-MM-DD'),
+          until: this.selectedDate.format('YYYY-MM-DD')
         }
       }).then((res) => {
-        this.absentUsers = []
-        for (let i = 0; i < store.getters.users.length; i++) {
-          const user = store.getters.users[i];
-          const leave = res.data[user.id][this.selectedDay.format('YYYY-MM-DD')]
-          if(leave['sickness'].length > 0){
-            // is sick
-            user["absenceIcon"] = "fa fa-plus-square plus-square"
-            user["absenceType"] = "Sickness"
-            this.absentUsers.push(user)
-          }
-          else if(leave['leave'].length > 0){
-            // other leave type
-            user["absenceIcon"] = "fa fa-calendar calendar"
-            user["absenceType"] = "Other"
+        this.absences = [];
 
-            const leaveStart = moment(leave["leave"][0]["starts_at"])
-            const leaveEnd = moment(leave["leave"][0]["ends_at"])
-            user["fullDay"] = leaveEnd.diff(leaveStart, "minutes") >= (leave["work_hours"]*60-1) ? "fa fa-hourglass hourglass" : "fa fa-hourglass-end hourglass-end"
-            user["dayTooltip"] = leaveEnd.diff(leaveStart, "minutes") >= (leave["work_hours"]*60-1) ? "Full-day" : "Half-day"
-            
-            this.absentUsers.push(user)
+        if (!this.selectedDate && !res.data) return;
+
+        toPairs(res.data).forEach(([userId, availability]) => {
+          const currentDayAvailability = availability[this.selectedDate.format('YYYY-MM-DD')]
+
+          if (currentDayAvailability?.sickness.length || currentDayAvailability?.leave.length) {
+            const user = store.getters.users.find((user) => user.id === parseInt(userId));
+            this.absences.push({
+              ...user,
+              isSick: currentDayAvailability.sickness.length > 0,
+              isOnLeave: currentDayAvailability.leave.length > 0,
+            })
           }
-        }
+        });
       });
-
-      store.dispatch(types.NINETOFIVER_API_REQUEST, {
-        path: '/holidays/',
-        params: {
-          date: this.selectedDay.format('YYYY-MM-DD')
-        }
-      }).then((res) => {
-        this.holidays = res.data.results
-      })
     }
-  }
+  },
+  methods: {
+    previousDay() {
+      this.$set(this, 'selectedDate', moment(this.selectedDate).subtract(1, 'days'))
+    },
+    nextDay() {
+      this.$set(this, 'selectedDate', moment(this.selectedDate).add(1, 'days'))
+    },
+  },
 }
 
 </script>
 
-<style lang="less" scoped>
-.chevron {
-  color: #0aa6c9;
+<style lang="scss" scoped>
+@import "../../assets/scss/components/widgets";
 
-  &:hover {
-    cursor: pointer;
-  }
-}
-
-.dist-icon{
-  position: relative;
-  top: 20px;
-  z-index: 1;
-  background-color: #fff;
-  padding: 4px;
-  border-radius: 8px;
-  margin-top: -20px;
-}
-
-.dist-icon-more{
-  position: relative;
-  top: 45px;
-  left:-22px;
-  z-index: 1;
-  background-color: #fff;
-  padding: 4px;
-  border-radius: 8px;
-  margin-top: -20px;
+.no-absences {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $success;
 }
 </style>
