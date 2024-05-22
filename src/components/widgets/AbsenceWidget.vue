@@ -13,12 +13,12 @@ div(class='card widget-card widget-px widget-py shadow-sm mb-3')
     div(class='flex-grow-1')
     div(class="d-flex gx-1")
       button(
-        class="btn btn-success-soft rounded-pill btn-sm btn-square text-success d-flex align-items-center"
+        class="btn btn-danger-soft rounded-pill btn-sm btn-square text-danger d-flex align-items-center"
         @click="previousDay"
       )
         font-awesome-icon(:icon="faChevronLeft")
       button(
-        class="btn btn-success-soft rounded-pill btn-sm btn-square text-success d-flex align-items-center"
+        class="btn btn-danger-soft rounded-pill btn-sm btn-square text-danger d-flex align-items-center"
         @click="nextDay"
       )
         font-awesome-icon(:icon="faChevronRight")
@@ -30,7 +30,7 @@ div(class='card widget-card widget-px widget-py shadow-sm mb-3')
         :key="user.id"
         class="d-flex align-items-center"
       )
-        AgendaAvatar(:user="user" color="success" :tooltip="user.isSick ? 'Sick' : 'On leave'")
+        AgendaAvatar(:user="user" color="danger" :tooltip="user.isSick ? 'Sick' : 'On leave'")
           template(slot="icon")
             font-awesome-icon(v-if="user.isSick" :icon="faTemperatureThreeQuarters")
             font-awesome-icon(v-if="user.isOnLeave" :icon="faTree")
@@ -38,7 +38,7 @@ div(class='card widget-card widget-px widget-py shadow-sm mb-3')
         v-if="absences.length === 0"
         class="d-flex justify-content-center align-items-center w-100"
       )
-        p(class="text-success no-absences m-0")
+        p(class="text-danger no-absences m-0")
           | No absences on {{ formattedDate }}
 </template>
 
@@ -126,6 +126,6 @@ export default {
 .no-absences {
   font-size: 1rem;
   font-weight: 700;
-  color: $success;
+  color: $danger;
 }
 </style>

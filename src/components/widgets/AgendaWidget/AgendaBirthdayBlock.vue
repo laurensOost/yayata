@@ -5,7 +5,7 @@ import {faGift} from "@fortawesome/free-solid-svg-icons";
 <template lang="pug">
   div(class='col')
     AgendaBlock(
-      color="danger-soft"
+      color="success-soft"
       :icon="faGift"
       title="Month birthdays"
       :style="{flexGrow: 1}"
@@ -17,7 +17,7 @@ import {faGift} from "@fortawesome/free-solid-svg-icons";
           class="d-flex align-items-center"
           :title="getTitleUserString(user)"
         )
-          AgendaAvatar(:user="user" color="danger")
+          AgendaAvatar(:user="user" color="success")
             template(slot="info")
               p(class="text-muted m-0")
                 | {{ getUserRelativeBirthdayString(user) }}
