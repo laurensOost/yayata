@@ -98,6 +98,9 @@ export const router = new VueRouter({
           name: 'dashboard',
           path: '/dashboard',
           component: Dashboard,
+          meta: {
+            title: "Dashboard",
+          }
         },
         {
           name: 'calendar_redirect',
@@ -113,6 +116,9 @@ export const router = new VueRouter({
           name: 'calendar_month',
           path: '/calendar/month/:year/:month',
           component: Month,
+          meta: {
+            title: "Month calendar"
+          }
         },
         {
           name: 'calendar_week_redirect',
@@ -123,21 +129,33 @@ export const router = new VueRouter({
           name: 'calendar_week',
           path: '/calendar/week/:year/:week',
           component: Week,
+          meta: {
+            title: "Week calendar"
+          }
         },
         {
           name: 'colleagues',
           path: '/colleagues',
           component: Colleagues,
+          meta: {
+            title: "Colleagues"
+          }
         },
         {
           name: 'colleague',
           path: '/colleagues/:userId',
           component: Colleague,
+          meta: {
+            title: "Colleague"
+          }
         },
         {
           name: 'leave',
           path: '/leave',
           component: Leave,
+          meta: {
+            title: "Leaves"
+          }
         },
         {
           name: 'availability_redirect',
@@ -153,26 +171,41 @@ export const router = new VueRouter({
           name: 'availability_week',
           path: '/availability/week/:year/:month/:date',
           component: Availability,
+          meta: {
+            title: "Availability"
+          }
         },
         {
           name: 'timesheets',
           path: '/timesheets',
           component: Timesheets,
+          meta: {
+            title: "Timesheets"
+          }
         },
         {
           name: 'import',
           path: '/import',
           component: Import,
+          meta: {
+            title: "Import"
+          }
         },
         {
           name: 'faq',
           path: '/faq',
           component: FAQ,
+          meta: {
+            title: "FAQ"
+          }
         },
         {
           name: 'changelog',
           path: '/changelog',
           component: Changelog,
+          meta: {
+            title: "Changelog"
+          }
         },
       ],
     },
