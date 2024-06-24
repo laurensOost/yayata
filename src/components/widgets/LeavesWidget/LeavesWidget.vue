@@ -4,7 +4,7 @@ import { faArrowUp } from "@fortawesome/free-solid-svg-icons";
 </script>
 
 <template lang="pug">
-  div(class='card widget-card shadow-sm mb-3' v-if="leaves.length")
+  div(class='card widget-card shadow-sm' v-if="leaves.length")
     div(class="card-header widget-px py-0")
       p(class='widget-py')
         | Leaves
