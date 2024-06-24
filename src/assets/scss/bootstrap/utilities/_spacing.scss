@@ -1,13 +1,24 @@
-@for $i from 0 through 10 {
-  .gx-#{$i} {
-    column-gap: #{$i * 4}px;
-  }
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins/breakpoints";
 
-  .gy-#{$i} {
-    row-gap: #{$i * 4}px;
-  }
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
 
-  .g-#{$i} {
-    gap: #{$i * 4}px;
+    @for $i from 0 through 10 {
+      .gx#{$infix}-#{$i} {
+        column-gap: #{$i * 4}px;
+      }
+
+      .gy#{$infix}-#{$i} {
+        row-gap: #{$i * 4}px;
+      }
+
+      .g#{$infix}-#{$i} {
+        gap: #{$i * 4}px;
+      }
+    }
   }
 }
+
+
