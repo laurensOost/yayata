@@ -15,12 +15,11 @@ import {faGift} from "@fortawesome/free-solid-svg-icons";
           v-for="user in birthdayUsers"
           :key="user.id"
           class="d-flex align-items-center"
-          :title="getTitleUserString(user)"
         )
           AgendaAvatar(:user="user" color="success")
             template(slot="info")
               p(class="text-muted m-0")
-                | {{ getUserRelativeBirthdayString(user) }}
+                | {{ getUserBirthdayString(user) }}
 </template>
 
 <script>
@@ -34,42 +33,17 @@ export default {
   components: {
     AgendaBlock,
     AgendaAvatar,
-    faGift
   },
   methods: {
-    getUserRelativeBirthdayString(user) {
-      const birthday = moment(user.userinfo.birth_date, 'YYYY-MM-DD')
-      const nextAge = moment().diff(birthday, 'years') + 1
-      const thisYearBirthday = moment(birthday).year(moment().year())
+    getUserBirthdayString(user) {
+      const birthday = moment(user.userinfo.birth_date, 'YYYY-MM-DD');
+      const alreadyHadBirthday = birthday.clone().set({
+        year: moment().year()
+      }).isBefore(moment());
+      const nextAge = moment().diff(birthday, 'years') + (alreadyHadBirthday ? 0 : 1);
 
-      if (thisYearBirthday.diff(moment(), 'days') === 0) {
-        return `Turns ${nextAge} today! 🎉`
-      } else if (thisYearBirthday.diff(moment(), 'days') === 1) {
-        return `Turns ${nextAge} tomorrow! 🎉`
-      } else if (thisYearBirthday.diff(moment(), 'days') > 1) {
-        return `Turns ${nextAge} in ${thisYearBirthday.diff(moment(), 'days')} days`
-      } else {
-        return `Is ${nextAge} years old`
-      }
+      return `${alreadyHadBirthday ? 'Turned' : 'Turns'} ${nextAge} on ${birthday.format('MMMM Do')}`;
     },
-    getTitleUserString(user) {
-      const name = user.display_label
-      const birthday = moment(user.userinfo.birth_date, 'YYYY-MM-DD')
-      const nextAge = moment().diff(birthday, 'years') + 1
-      const thisYearBirthday = moment(birthday).year(moment().year())
-      const daysDiff = thisYearBirthday.diff(moment(), 'days')
-
-      if (daysDiff === 0) {
-        return `${name} birthday is today! 🎉`
-      } else if (daysDiff === 1) {
-        return `${name} birthday is tomorrow! 🎉`
-      } else if (daysDiff > 1) {
-        return `${name} ${nextAge} birthday is in ${daysDiff} days`
-      } else {
-        return `${name} ${nextAge} birthday was ${-daysDiff} days ago`
-      }
-
-    }
   },
   computed: {
     birthdayUsers: function () {
