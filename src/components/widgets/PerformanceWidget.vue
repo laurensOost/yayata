@@ -1,5 +1,5 @@
 <template lang="pug">
-  div(class='card widget-card widget-px widget-py shadow-sm mb-3')
+  div(class='card widget-card widget-px widget-py shadow-sm')
     div(class="card-header mb-3 p-0")
       | Log performance
     div(class="card-body d-flex flex-column" v-on:keyup.enter="submit")
@@ -16,8 +16,8 @@
           @select="handleContractChange"
         )
 
-      div(class='d-flex gx-3 mb-2')
-        div(class='form-group m-0 w-50')
+      div(class='d-flex flex-wrap flex-lg-nowrap gx-3 mb-2')
+        div(class='form-group m-0 w-50 flex-grow-1 mb-md-2 mb-lg-0')
           label(for='duration') Duration
           input(
             v-model="model.duration",
@@ -28,7 +28,7 @@
             required='required',
             pattern="^([0-9]{1,2}(?:(?::[0-9]{2})?(?:[\\.,][0-9]{1,2})?)?)$",
           )
-        div(class='form-group m-0 w-50')
+        div(class='form-group m-0 w-50 flex-grow-1')
           label(for='performance_type') Type
           b-form-select(
             v-model="model.performance_type"
@@ -390,7 +390,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "../../assets/scss/components/widgets";
+@import "../../assets/scss/styles";
 
 .card-body {
   button {
