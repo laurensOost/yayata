@@ -30,10 +30,13 @@ div(class='card widget-card widget-px widget-py shadow-sm')
         :key="user.id"
         class="d-flex align-items-center"
       )
-        AgendaAvatar(:user="user" color="danger" :tooltip="user.isSick ? 'Sick' : 'On leave'")
+        AgendaAvatar(:user="user" color="danger")
           template(slot="icon")
             font-awesome-icon(v-if="user.isSick" :icon="faTemperatureThreeQuarters")
             font-awesome-icon(v-if="user.isOnLeave" :icon="faTree")
+          template(slot="info")
+            p(class="m-0")
+              | {{ user.isSick ? 'Sick' : 'On leave' }}
       div(
         v-if="absences.length === 0"
         class="d-flex justify-content-center align-items-center w-100"
