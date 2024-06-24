@@ -3,8 +3,16 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
 </script>
 
 <template lang="pug">
-  ThemedBlock(:color='color' class="agenda-block gx-3")
-    div(class="agenda-header d-flex align-items-center gx-2")
+  ThemedBlock(
+    :color='color'
+    class="agenda-block gy-3"
+    :class="$props.noPadding && 'p-0'"
+  )
+    slot(name="custom_header")
+    div(
+      class="agenda-header d-flex align-items-center gx-2"
+      v-if="!$slots.custom_header"
+      )
       FontAwesomeIcon(:icon='icon' :class="`text-${iconColor}`")
       p {{ title }}
       div(class="flex-grow-1")
@@ -14,7 +22,6 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
 
 <script>
 import ThemedBlock from "../../ui/ThemedBlock.vue";
-
 export default {
   name: 'AgendaBlock',
   components: {ThemedBlock},
@@ -25,11 +32,15 @@ export default {
     },
     icon: {
       type: [Object, Array, String],
-      required: true,
+      required: false,
     },
     title: {
       type: String,
-      required: true,
+      required: false,
+    },
+    noPadding: {
+      type: Boolean,
+      default: false,
     }
   },
   computed: {
