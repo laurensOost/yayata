@@ -229,7 +229,6 @@ export default {
       this.workHoursForSelectedDate = -1
     },
     'model.timeTo'(value) {
-      console.log(value)
       if (moment(value).isBefore(this.model.timeFrom)) {
         this.$set(
             this.model,
@@ -291,10 +290,6 @@ export default {
 
   methods: {
     async handleDatesChange() {
-      console.log(moment(this.model.timeTo).set({
-        hour: 17,
-        minute: 0,
-      }).toDate())
       if (this.isMultipleDays) {
         this.$set(
             this.model,
