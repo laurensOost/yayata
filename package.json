@@ -16,6 +16,7 @@
         "bootstrap": "^4.6.2",
         "chart.js": "^3.9.1",
         "chartjs-plugin-datalabels": "^2.2.0",
+        "ics": "^3.7.6",
         "moment": "^2.30.1",
         "values.js": "^2.1.1",
         "vue": "^2.5.16",
