@@ -1,15 +1,19 @@
 <template lang="pug">
-div
-  div(class='row')
-    div(class='col')
-      DueTimesheetWarningWidget
+  div(class='dashboard')
+    div(class='row')
+      div(class='col')
+        DueTimesheetWarningWidget
 
-      AgendaBirthdayBlock
     div(class='row gy-3 mb-3')
       div(class='col-xl-3')
         div(class='row d-flex flex-column flex-sm-row flex-xl-column gy-3')
           AgendaCalendarBlock
           AgendaEventsBlock
+
+      AgendaBirthdayBlock(class="col-xl-3")
+
+      div(class='col-xl-6 d-flex')
+        AbsenceWidget(class="flex-grow-1")
 
     div(class='row gy-3 statistics full-height mb-3')
       div(class='col-6 col-sm-6 col-md-6 col-lg-3')
@@ -19,13 +23,11 @@ div
       div(class='col-12 col-sm-12 col-md-12 col-lg-6')
         PerformanceWidget(v-if='timesheet' :timesheet='timesheet')
 
-  div(class='row')
-    div(class='col-xl-6')
-      LeavesWidget
-      LeaveWidget
-
-    div(class='col-xl-6')
-      AbsenceWidget
+    div(class='row gy-3')
+      div(class='col-12 col-sm-12 col-md-12 col-lg-6')
+        LeavesWidget
+      div(class='col-12 col-sm-12 col-md-12 col-lg-6')
+        LeaveWidget
 </template>
 
 <script>
@@ -37,21 +39,19 @@ import LeaveWidget from './widgets/LeaveWidget.vue';
 import LeavesWidget from "./widgets/LeavesWidget/LeavesWidget.vue";
 import ContractsChartWidget from "./widgets/Charts/ContractsChartWidget.vue";
 import WorkSummaryWidget from "./widgets/Charts/WorkSummaryWidget.vue";
-import AgendaQuoteBlock from "./widgets/AgendaWidget/AgendaQuoteBlock.vue";
 import AgendaEventsBlock from "./widgets/AgendaWidget/AgendaEventsBlock.vue";
 import AgendaBirthdayBlock from "./widgets/AgendaWidget/AgendaBirthdayBlock.vue";
 import AgendaCalendarBlock from "./widgets/AgendaWidget/AgendaCalendarBlock.vue";
 import AbsenceWidget from "./widgets/AbsenceWidget.vue";
 
-
 export default {
   name: 'dashboard',
 
-  created: function() {
+  created: function () {
     new Promise((resolve) => {
       if (!store.getters.current_timesheet) {
         store.dispatch(types.NINETOFIVER_RELOAD_TIMESHEETS).then(() => resolve())
-      } else{
+      } else {
         resolve()
       }
     })
@@ -66,7 +66,6 @@ export default {
     AgendaCalendarBlock,
     AgendaBirthdayBlock,
     AgendaEventsBlock,
-    AgendaQuoteBlock,
     LeavesWidget,
     PerformanceWidget,
     DueTimesheetWarningWidget,
@@ -84,18 +83,31 @@ export default {
 </script>
 
 <style scoped lang='scss'>
-.row {
+.dashboard {
   --gap: 12px;
-  margin-left: calc(var(--gap) * -0.5);
-  margin-right: calc(var(--gap) * -0.5);
 
-  & > div {
-    padding: 0 calc(var(--gap) / 2);
+  .col {
+    padding: 0 calc(var(--gap) * 0.5);
   }
 
-  &.full-height {
-    & > div > div {
-      height: 100%;
+  @for $i from 1 through 12 {
+    .col-xl-#{$i} {
+      padding: 0 calc(var(--gap) * 0.5);
+    }
+  }
+
+  .row {
+    margin-left: calc(var(--gap) * -0.5);
+    margin-right: calc(var(--gap) * -0.5);
+
+    & > div {
+      padding: 0 calc(var(--gap) / 2);
+    }
+
+    &.full-height {
+      & > div > div {
+        height: 100%;
+      }
     }
   }
 }
