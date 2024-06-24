@@ -10,13 +10,13 @@ div
       AgendaBirthdayBlock
       AgendaCalendarBlock
 
-  div(class='row statistics full-height mb-3')
-    div(class='col-xl-3')
-      WorkSummaryWidget(v-if='timesheet' :timesheet='timesheet')
-    div(class='col-xl-3')
-      ContractsChartWidget(v-if='timesheet' :timesheet='timesheet')
-    div(class='col-xl-6')
-      PerformanceWidget(v-if='timesheet' :timesheet='timesheet')
+    div(class='row gy-3 statistics full-height mb-3')
+      div(class='col-6 col-sm-6 col-md-6 col-lg-3')
+        WorkSummaryWidget(v-if='timesheet' :timesheet='timesheet')
+      div(class='col-6 col-sm-6 col-md-6 col-lg-3')
+        ContractsChartWidget(v-if='timesheet' :timesheet='timesheet')
+      div(class='col-12 col-sm-12 col-md-12 col-lg-6')
+        PerformanceWidget(v-if='timesheet' :timesheet='timesheet')
 
   div(class='row')
     div(class='col-xl-6')

@@ -12,7 +12,7 @@ ChartJS.register(Title, Tooltip, ArcElement, CategoryScale, ChartDataLabels);
 </script>
 
 <template lang="pug">
-  div(class='card widget-card widget-px widget-py shadow-sm mb-3' v-if="data")
+  div(class='card widget-card widget-px widget-py shadow-sm' v-if="data")
     div(class="card-header mb-3 p-0")
       | Work summary
 
