@@ -41,8 +41,8 @@ import {faHourglassHalf, faHourglassEnd} from "@fortawesome/free-solid-svg-icons
             b-form-select-option(:value='null' disabled)
               | < Nothing selected >
 
-      div(class='d-flex gx-3 mb-2')
-        div(class='form-group w-50 m-0')
+      div(class='d-flex flex-wrap flex-lg-nowrap gx-3 mb-2')
+        div(class='form-group m-0 w-50 flex-grow-1 mb-md-2 mb-lg-0')
           label(for='time_from') Time from
           date-picker(
             v-model='model.timeFrom'
@@ -56,7 +56,7 @@ import {faHourglassHalf, faHourglassEnd} from "@fortawesome/free-solid-svg-icons
             @change="handleDatesChange"
           )
 
-        div(class='form-group w-50 m-0')
+        div(class='form-group m-0 w-50 flex-grow-1')
           label(for='time_to') Time to
           date-picker(
             v-model='model.timeTo'
