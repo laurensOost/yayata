@@ -1,6 +1,12 @@
 <template lang="pug">
-  div(class="d-flex flex-row align-items-center gx-2" :title="tooltip" v-b-tooltip.hover.bottom="{ variant: avatarColor[0] }")
-    div(class="avatar")
+  div(
+    class="d-flex flex-row align-items-center gx-2 avatar-container"
+    :title="tooltip"
+    role='button'
+    v-b-tooltip.hover.bottom="{ variant: avatarColor[0] }"
+    @click="navigateToUser"
+  )
+    div(class="avatar" :class="`text-${avatarColor[0]}`")
       img(
         :src='getAvatarUrl(user)'
         :alt="user.display_label"
@@ -11,7 +17,6 @@
       )
       div(
         class="avatar-icon"
-        :class="`text-${avatarColor[0]}`"
       )
         slot(name="icon")
 
@@ -35,56 +40,73 @@ export default {
   },
   methods: {
     getAvatarUrl: utils.getAvatarUrl,
+    navigateToUser() {
+      this.$router.push({
+        name: 'colleague',
+        params: {
+          userId: this.user.id,
+        }
+      })
+    }
   }
 }
 </script>
 
 <style scoped lang="scss">
-@import "../../../assets/scss/bootstrap/variables";
+@import "../../../assets/scss/bootstrap/theme";
 
-.avatar {
-  position: relative;
+.avatar-container {
+  & > .avatar {
+    position: relative;
 
-  & > .avatar-image {
-    border: 2px solid currentColor;
-    user-select: none;
-    pointer-events: none;
-  }
+    & > .avatar-image {
+      position: relative;
+      border: 2px solid currentColor;
+      user-select: none;
+      pointer-events: none;
+      z-index: 2
+    }
 
-  & > .avatar-icon:has(svg) {
-    $size: 1rem;
+    & > .avatar-icon:has(svg) {
+      $size: 1rem;
 
-    width: $size;
-    height: $size;
-    aspect-ratio: 1 / 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    bottom: $size / -5;
-    right: $size / -5;
-    border-radius: 50%;
-    background: currentColor;
-    padding: 0.25rem;
-    user-select: none;
-    pointer-events: none;
+      width: $size;
+      height: $size;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      bottom: calc($size / -5);
+      right: calc($size / -5);
+      border-radius: 50%;
+      background: currentColor;
+      padding: 0.25rem;
+      user-select: none;
+      pointer-events: none;
+      z-index: 3;
 
-    & > svg {
-      font-size: $size / 2;
-      color: $gray-900;
+      & > svg {
+        font-size: calc($size / 2);
+        color: $gray-900;
+      }
     }
   }
-}
 
-.avatar-info {
-  & > p:first-child {
-    font-size: 0.875rem;
-    color: $gray-900;
-  }
+  & > .avatar-info {
+    position: relative;
+    z-index: 2;
 
-  & > p:nth-child(2) {
-    font-size: 0.75rem;
-    color: $gray-600;
+    & > p:first-child {
+      font-size: 0.875rem;
+      color: $gray-900;
+      line-height: 1.1;
+    }
+
+    & > p:nth-child(2) {
+      font-size: 0.75rem;
+      color: $gray-600;
+    }
   }
 }
 </style>
