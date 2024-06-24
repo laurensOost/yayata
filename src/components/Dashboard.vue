@@ -4,11 +4,12 @@ div
     div(class='col')
       DueTimesheetWarningWidget
 
-  div(class='row mb-3')
-      AgendaQuoteBlock
-      AgendaEventsBlock
       AgendaBirthdayBlock
-      AgendaCalendarBlock
+    div(class='row gy-3 mb-3')
+      div(class='col-xl-3')
+        div(class='row d-flex flex-column flex-sm-row flex-xl-column gy-3')
+          AgendaCalendarBlock
+          AgendaEventsBlock
 
     div(class='row gy-3 statistics full-height mb-3')
       div(class='col-6 col-sm-6 col-md-6 col-lg-3')
