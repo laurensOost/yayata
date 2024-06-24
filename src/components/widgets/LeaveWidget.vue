@@ -46,28 +46,26 @@ import {faHourglassHalf, faHourglassEnd} from "@fortawesome/free-solid-svg-icons
           label(for='time_from') Time from
           date-picker(
             v-model='model.timeFrom'
-            type='datetime'
-            format='YYYY-MM-DD HH:mm'
+            :type='timePickerType'
+            :format='timePickerFormat'
             :placeholder='new Date() | moment("YYYY-MM-DD HH:mm")'
             :lang="datePickerLang"
             :time-picker-options='{ start: "06:00", step: "00:15", end: "20:00" }'
             :shortcuts='datePickerShortcuts'
             id='time_from'
-            @change="handleDatesChange"
           )
 
         div(class='form-group m-0 w-50 flex-grow-1')
           label(for='time_to') Time to
           date-picker(
             v-model='model.timeTo'
-            type='datetime'
-            format='YYYY-MM-DD HH:mm',
+            :type='timePickerType'
+            :format='timePickerFormat',
             :placeholder='new Date() | moment("YYYY-MM-DD HH:mm")'
             :lang="datePickerLang"
             :time-picker-options='{ start: "06:00", step: "00:15", end: "20:00" }'
             :shortcuts='datePickerShortcuts'
             id='time_to'
-            @change="handleDatesChange"
           )
 
       div(class='form-group')
@@ -86,6 +84,7 @@ import {faHourglassHalf, faHourglassEnd} from "@fortawesome/free-solid-svg-icons
             class='btn btn-primary-soft btn-sm btn-square text-primary d-flex align-items-center'
             v-b-tooltip.bottom
             :title="'Half day'"
+            :disabled='isMultipleDays'
             @click="changeHalfDay(true)"
           )
             FontAwesomeIcon(:icon='faHourglassEnd' :style="{'aspect-ratio': '1/1' }" )
@@ -93,6 +92,7 @@ import {faHourglassHalf, faHourglassEnd} from "@fortawesome/free-solid-svg-icons
             class='btn btn-primary-soft btn-sm btn-square text-primary d-flex align-items-center'
             v-b-tooltip.bottom
             :title="'Full day'"
+            :disabled='isMultipleDays'
             @click="changeHalfDay(false)"
           )
             FontAwesomeIcon(:icon='faHourglassHalf' :style="{'aspect-ratio': '1/1'}" )
@@ -204,7 +204,13 @@ export default {
       return store.getters.leave_types
     },
     isMultipleDays() {
-      return Math.abs(moment(this.model.timeFrom).diff(moment(this.model.timeTo), 'days')) > 0
+      return !moment(this.model.timeFrom).isSame(moment(this.model.timeTo), 'day')
+    },
+    timePickerFormat() {
+      return this.isMultipleDays ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm'
+    },
+    timePickerType() {
+      return this.isMultipleDays ? 'date' : 'datetime';
     },
     isFutureLeave() {
       return moment(this.model.timeFrom).isAfter(moment(), 'day')
@@ -217,7 +223,7 @@ export default {
   },
 
   watch: {
-    'model.timeFrom'(value) {
+    'model.timeFrom'(value, oldValue) {
       if (moment(value).isAfter(this.model.timeTo)) {
         this.$set(
             this.model,
@@ -226,9 +232,20 @@ export default {
         )
       }
 
+      if (!moment(value).isSame(oldValue, 'day')) {
+        this.$set(
+            this.model,
+            'timeFrom',
+            moment(this.model.timeFrom).set({
+              hour: 9,
+              minute: 0,
+            }).toDate()
+        )
+      }
+
       this.workHoursForSelectedDate = -1
     },
-    'model.timeTo'(value) {
+    'model.timeTo'(value, oldValue) {
       if (moment(value).isBefore(this.model.timeFrom)) {
         this.$set(
             this.model,
@@ -237,10 +254,21 @@ export default {
         )
       }
 
+      if (!moment(value).isSame(oldValue, 'day')) {
+        this.$set(
+            this.model,
+            'timeTo',
+            moment(this.model.timeTo).set({
+              hour: this.workHours ? 9 + this.workHours : 17,
+              minute: 0,
+            }).toDate()
+        )
+      }
+
       this.workHoursForSelectedDate = -1
     },
-    isMultipleDays(value) {
-      if (value) {
+    isMultipleDays(value, oldValue) {
+      if (oldValue && !value || !oldValue && value) {
         this.$set(
             this.model,
             'timeFrom',
@@ -253,7 +281,7 @@ export default {
             this.model,
             'timeTo',
             moment(this.model.timeTo).set({
-              hour: 17,
+              hour: this.workHours ? 9 + this.workHours : 17,
               minute: 0,
             }).toDate()
         )
@@ -289,26 +317,6 @@ export default {
   },
 
   methods: {
-    async handleDatesChange() {
-      if (this.isMultipleDays) {
-        this.$set(
-            this.model,
-            'timeFrom',
-            moment(this.model.timeFrom).set({
-              hour: 9,
-              minute: 0,
-            }).toDate()
-        )
-        this.$set(
-            this.model,
-            'timeTo',
-            moment(this.model.timeTo).set({
-              hour: 17,
-              minute: 0,
-            }).toDate()
-        )
-      }
-    },
     async setWorkingHoursForTheDate() {
       if (!this.isMultipleDays) {
         const rangeInfo = await this.getRangeInfo(moment(this.model.timeFrom), moment(this.model.timeTo))
