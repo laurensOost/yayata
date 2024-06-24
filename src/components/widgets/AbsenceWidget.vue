@@ -7,7 +7,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 </script>
 <template lang="pug">
-div(class='card widget-card widget-px widget-py shadow-sm mb-3')
+div(class='card widget-card widget-px widget-py shadow-sm')
   div(class="card-header d-flex flex-row align-items-center mb-3 p-0")
     span Absences on {{ formattedDate }}
     div(class='flex-grow-1')
