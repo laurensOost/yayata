@@ -10,7 +10,7 @@ import {faGift} from "@fortawesome/free-solid-svg-icons";
       title="Month birthdays"
       :style="{flexGrow: 1}"
     )
-      div(class="d-flex align-items-start flex-column gy-1 agenda-block-body")
+      div(class="d-flex align-items-start flex-row flex-xl-column flex-wrap flex-xl-nowrap g-3 gy-xl-1 agenda-block-body")
         div(
           v-for="user in birthdayUsers"
           :key="user.id"
