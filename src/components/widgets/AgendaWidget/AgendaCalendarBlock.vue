@@ -37,11 +37,6 @@ import * as types from "../../../store/mutation-types";
 import {sample} from "lodash";
 
 /**
- * @typedef Digit
- * @type {'1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0'}
- */
-
-/**
  * @typedef Quote
  * @type {object}
  * @property {number} id

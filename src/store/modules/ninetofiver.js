@@ -2,7 +2,58 @@ import Vue from 'vue';
 import * as types from '../mutation-types';
 import moment from "moment-timezone";
 
-// initial state
+
+/**
+ * @typedef LeaveType
+ * @type {Object}
+ * @property {number} id
+ * @property {"LeaveType"} type
+ * @property {string} display_label
+ */
+
+/**
+ * @typedef LeaveDate
+ * @type {Object}
+ * @property {number} id
+ * @property {"LeaveDate"} type
+ * @property {string} display_label
+ * @property {string} created_at
+ * @property {string} updated_at
+ * @property {string} starts_at
+ * @property {string} ends_at
+ */
+
+/**
+ * @typedef Leave
+ * @type {Object}
+ * @property {number} id
+ * @property {"Leave"} type
+ * @property {string} display_label
+ * @property {string} created_at
+ * @property {string} updated_at
+ * @property {"draft" | "pending" | "approved" | "rejected"} status
+ * @property {Array<LeaveDate>} leavedate_set
+ * @property {LeaveType} leave_type
+ * @property {[]} attachments
+ * @property {string} description
+ */
+
+/**
+ * Initial State
+ *
+ * @typedef NinetofiverState
+ * @type {Object}
+ * @property {null} performance_types
+ * @property {Array<Leave> | null} leaves
+ * @property {null} timesheets
+ * @property {null} locations
+ * @property {null} leave_types
+ * @property {null} contract_roles
+ * @property {null} contracts
+ * @property {null} contract_users
+ * @property {null} user
+ * @property {null} users
+ */
 const state = {
   user: null,
   leaves: null,
@@ -50,7 +101,12 @@ const mutations = {
   },
 }
 
-// getters
+/**
+ * Getters
+ *
+ * @type {Object}
+ * @property {Array<Leave> | null} leaves
+ */
 const getters = {
   user: state => state.user,
   leaves: state => state.leaves,

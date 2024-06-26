@@ -59,11 +59,6 @@ import {createEvent} from "ics";
 import {linkify} from "../../../utils/text/linkify";
 
 /**
- * @typedef Digit
- * @type {'1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0'}
- */
-
-/**
  * @typedef Event
  * @type {object}
  * @property {number} id

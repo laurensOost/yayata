@@ -11,7 +11,12 @@ Vue.use(Vuex)
 
 const debug = process.env.NODE_ENV !== 'production'
 
-export default new Vuex.Store({
+/**
+ * Vuex store
+ *
+ * @type {Vuex.Store<NinetofiverState>}
+ */
+const store =  new Vuex.Store({
   actions,
   getters,
   modules: {
@@ -30,3 +35,5 @@ export default new Vuex.Store({
     }),
   ],
 })
+
+export default store;
