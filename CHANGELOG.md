@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.20] - 2023-06-26
+
+### Added
+- Year selector in the leaves widget (Dashboard).
+### Fixed
+- Time of the leave request is not being reset after the request is submitted.
+### Changed
+- User avatar in the absences widget (Dashboard) does not contain leave type.
+
+## [1.0.19] - 2023-06-24
+
+### Added
+- Saving event as ICS file in the events widget (Dashboard).
+### Fixed
+- Dashboard and all widgets are now responsive.
+- User avatar in the absences and birthday widgets (Dashboard) is now clickable and redirects to the user's profile.
+- Leave widget (Dashboard) behaviour is now smoother when creating one-day/multi-day leave. 
+### Changed
+- Calendar and Quotes widgets are now merged to one widget.
+- User avatar in the birthday widget (Dashboard) displays absolute birthday date instead of relative.
+
 ## [1.0.18] - 2023-06-21
 
 ### Added
