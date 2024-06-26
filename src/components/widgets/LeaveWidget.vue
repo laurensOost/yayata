@@ -382,8 +382,6 @@ export default {
         this.$set(this.model, 'id', null)
         this.$set(this.model, 'leave_type', store.getters.leave_types?.[0]?.id)
         this.$set(this.model, 'description', null)
-        this.$set(this.model, 'timeFrom', moment().set({hour: 9, minute: 0}).toDate())
-        this.$set(this.model, 'timeTo', moment().set({hour: 9 + this.workHours, minute: 0}).toDate())
       }
     },
 
