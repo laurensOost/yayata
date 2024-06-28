@@ -131,6 +131,8 @@ export default {
     'date',
   ],
 
+  emits: ['success', 'error'],
+
   data: () => {
     return {
       loading: false,
@@ -286,10 +288,51 @@ export default {
             }).toDate()
         )
       }
+    },
+    workHours(value) {
+      if (this.date) {
+        this.$set(
+            this.model,
+            'timeFrom',
+            moment(this.date).set({
+              hour: 9,
+              minute: 0,
+            }).toDate()
+        );
+
+        this.$set(
+            this.model,
+            'timeTo',
+            moment(this.date).set({
+              hour: value ? 9 + value : 17,
+              minute: 0,
+            }).toDate()
+        )
+      }
     }
   },
 
-  created: function () {
+  created() {
+    if (this.date) {
+      this.$set(
+          this.model,
+          'timeFrom',
+          moment(this.date).set({
+            hour: 9,
+            minute: 0,
+          }).toDate()
+      );
+
+      this.$set(
+          this.model,
+          'timeTo',
+          moment(this.date).set({
+            hour: this.workHours ? 9 + this.workHours : 17,
+            minute: 0,
+          }).toDate()
+      )
+    }
+
     Promise.all([
       new Promise(() => {
         // fetch work hours
@@ -301,7 +344,7 @@ export default {
           }
         }).then((res) => {
           this.workHours = res.data[store.getters.user.id][moment(moment.now()).format("YYYY-MM-DD")]["work_hours"]
-          this.resetForm()
+          this.resetForm(true)
         });
       }),
       new Promise((resolve) => {
@@ -312,7 +355,7 @@ export default {
         }
       }),
     ]).then(() => {
-      this.resetForm()
+      this.resetForm(true)
     })
   },
 
@@ -345,7 +388,7 @@ export default {
       )
     },
 
-    resetForm() {
+    resetForm(resetTime = false) {
       if (this.leave) {
         this.$set(
             this.model,
@@ -382,6 +425,11 @@ export default {
         this.$set(this.model, 'id', null)
         this.$set(this.model, 'leave_type', store.getters.leave_types?.[0]?.id)
         this.$set(this.model, 'description', null)
+
+        if (resetTime) {
+          this.$set(this.model, 'timeFrom', moment().set({hour: 9, minute: 0}).toDate())
+          this.$set(this.model, 'timeTo', moment().set({hour: 9 + this.workHours, minute: 0}).toDate())
+        }
       }
     },
 

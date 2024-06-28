@@ -39,11 +39,11 @@ div
       v-on:success='onPerformanceModified()'
     )
 
-  b-modal(ref='leaveModal' hide-header=true hide-footer=true lazy=true size='lg')
+  b-modal(ref='leaveModal' hide-header=true hide-footer=true lazy=true size='lg' content-class="bg-transparent border-0")
     LeaveWidget(
       :leave='selectedLeave'
       :date='selectedDate'
-      v-on:success='onLeaveModified()'
+      @success="onLeaveModified()"
     )
 
   b-modal(ref='attachmentModal' hide-header=true hide-footer=true lazy=true size='lg')
