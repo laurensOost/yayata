@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Year selector in the leaves widget (Dashboard).
 ### Fixed
+- Add using passed date in Leave widget (when creating a new leave request from Week view).
 - Time of the leave request is not being reset after the request is submitted.
 ### Changed
 - User avatar in the absences widget (Dashboard) does not contain leave type.
