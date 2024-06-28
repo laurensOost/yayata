@@ -289,49 +289,10 @@ export default {
         )
       }
     },
-    workHours(value) {
-      if (this.date) {
-        this.$set(
-            this.model,
-            'timeFrom',
-            moment(this.date).set({
-              hour: 9,
-              minute: 0,
-            }).toDate()
-        );
-
-        this.$set(
-            this.model,
-            'timeTo',
-            moment(this.date).set({
-              hour: value ? 9 + value : 17,
-              minute: 0,
-            }).toDate()
-        )
-      }
-    }
   },
 
   created() {
-    if (this.date) {
-      this.$set(
-          this.model,
-          'timeFrom',
-          moment(this.date).set({
-            hour: 9,
-            minute: 0,
-          }).toDate()
-      );
-
-      this.$set(
-          this.model,
-          'timeTo',
-          moment(this.date).set({
-            hour: this.workHours ? 9 + this.workHours : 17,
-            minute: 0,
-          }).toDate()
-      )
-    }
+    this.resetForm(true);
 
     Promise.all([
       new Promise(() => {
@@ -427,8 +388,12 @@ export default {
         this.$set(this.model, 'description', null)
 
         if (resetTime) {
-          this.$set(this.model, 'timeFrom', moment().set({hour: 9, minute: 0}).toDate())
-          this.$set(this.model, 'timeTo', moment().set({hour: 9 + this.workHours, minute: 0}).toDate())
+          this.$set(this.model, 'timeFrom', moment(
+              this.date ? this.date : new Date()
+          ).set({hour: 9, minute: 0}).toDate())
+          this.$set(this.model, 'timeTo', moment(
+              this.date ? this.date : new Date()
+          ).set({hour: 9 + this.workHours, minute: 0}).toDate())
         }
       }
     },
