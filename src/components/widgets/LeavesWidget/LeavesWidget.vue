@@ -90,7 +90,7 @@ export default {
     leaveYears() {
       if (this.leaves.length === 0) return [];
 
-      return uniq(this.leaveDates.map((date) => moment(date).format('YYYY')));
+      return uniq(this.leaveDates.map((date) => moment(date).format('YYYY'))).sort((a, b) => b - a);
     },
     /** @return {Array<Leave>} */
     leavesForSelectedYear() {
