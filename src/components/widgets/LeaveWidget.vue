@@ -78,8 +78,8 @@ import {faHourglassHalf, faHourglassEnd} from "@fortawesome/free-solid-svg-icons
           placeholder='Description'
         )
 
-      div(class='d-flex flex-column flex-md-row g-2 align-items-end')
-        div(class='w-100 w-md-50 d-flex flex-grow-1 align-items-end gx-2')
+      div(class='d-flex flex-column flex-sm-row g-2 align-items-end')
+        div(class='w-100 w-sm-auto d-flex flex-grow-1 align-items-end gx-2')
           button(
             class='btn btn-primary-soft btn-sm btn-square text-primary d-flex align-items-center'
             v-b-tooltip.bottom
@@ -96,16 +96,16 @@ import {faHourglassHalf, faHourglassEnd} from "@fortawesome/free-solid-svg-icons
             @click="changeHalfDay(false)"
           )
             FontAwesomeIcon(:icon='faHourglassHalf' :style="{'aspect-ratio': '1/1'}" )
-        div(class='w-100 w-md-50 d-flex flex-grow-1 justify-content-end align-items-stretch gx-2')
+        div(class='w-100 w-sm-50 d-flex flex-grow-1 justify-content-end align-items-stretch gx-2')
           button(
             v-if="model.id"
-            class='btn btn-danger-soft text-danger w-50 w-md-auto flex-grow-1 flex-grow-md-0'
+            class='btn btn-danger-soft text-danger w-50 w-sm-auto flex-grow-1 flex-sm-grow-0'
             type="submit"
             @click="remove()"
           ) delete
 
           button(
-            class='btn btn-primary-soft text-primary w-50 w-md-auto flex-grow-1 flex-grow-md-0'
+            class='btn btn-primary-soft text-primary w-50 w-sm-auto flex-grow-1 flex-sm-grow-0'
             type="submit"
             @click="submit()"
           ) request leave
