@@ -58,8 +58,8 @@
 
       div(class='flex-grow-1')
 
-      div(class='d-flex align-items-end')
-        div(class='w-50')
+      div(class='d-flex flex-column flex-sm-row g-2 align-items-end')
+        div(class='w-100 w-md-50')
           div(class='form-group w-auto mb-0')
             label(for='role') Role
             b-form-select(
@@ -76,17 +76,17 @@
                 b-form-select-option(:value='null' disabled)
                   | < Nothing selected >
 
-        div(class='w-50 d-flex justify-content-end align-items-end gx-2')
+        div(class='w-100 w-md-50 d-flex flex-grow-1 justify-content-end align-items-end gx-2')
           button(
             v-if="model.id",
             type='submit',
-            class='btn btn-danger-soft text-danger',
+            class='btn btn-danger-soft text-danger w-50 w-md-auto flex-grow-1 flex-grow-md-0',
             :disabled="loading",
             @click="remove()"
           ) delete
           button(
             type='submit',
-            class='btn btn-primary-soft text-primary',
+            class='btn btn-primary-soft text-primary w-50 w-md-auto flex-grow-1 flex-grow-md-0',
             :disabled="loading",
             @click="submit()",
           ) log time
