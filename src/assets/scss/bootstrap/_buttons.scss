@@ -1,6 +1,11 @@
 @import "bootstrap/scss/mixins/buttons";
+@import "bootstrap/scss/buttons";
 
 @import "variables";
+
+.btn {
+  height: auto;
+}
 
 .btn-square {
   aspect-ratio: 1 / 1;
