@@ -76,16 +76,20 @@ export default {
   },
   computed: {
     totalHours() {
-      return this.data?.work_hours ?? 0;
+      const hours = this.data?.work_hours;
+      return hours ? hours.toFixed(1) : 0;
     },
     computedWorkHours() {
-      return (this.data?.work_hours - this.data?.leave_hours - this.data?.holiday_hours) ?? 0;
+      const hours = this.data?.work_hours - this.data?.leave_hours - this.data?.holiday_hours;
+      return hours ? hours.toFixed(1) : 0;
     },
     holidayHours() {
-      return this.data?.holiday_hours ?? 0;
+      const hours = this.data?.holiday_hours;
+      return hours ? hours.toFixed(1) : 0;
     },
     leaveHours() {
-      return this.data?.leave_hours ?? 0;
+      const hours = this.data?.leave_hours;
+      return hours ? hours.toFixed(1) : 0;
     },
     chartData() {
       return [

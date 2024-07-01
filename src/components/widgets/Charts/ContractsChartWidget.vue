@@ -58,17 +58,29 @@ const options = {
 };
 
 const performances = computed(() => contractsData.value?.summary?.performances || []);
-const computedWorkHours = computed(() => (
-    contractsData.value?.work_hours -
-    contractsData.value?.leave_hours -
-    contractsData.value?.holiday_hours
-) ?? 0);
-const performedHours = computed(() => contractsData.value?.performed_hours || 0);
+const computedWorkHours = computed(() => {
+  const hours = (
+      contractsData.value?.work_hours -
+      contractsData.value?.leave_hours -
+      contractsData.value?.holiday_hours
+  );
+
+  return hours ? hours.toFixed(1) : 0;
+});
+const performedHours = computed(() => {
+  const hours = contractsData.value?.performed_hours;
+  return hours ? hours.toFixed(1) : 0;
+});
+const remainingHours = computed(() => {
+  const hours = contractsData.value?.remaining_hours;
+  return hours ? hours.toFixed(1) : 0;
+});
 const chartShades = computed(() => {
   const count = performances.value.length || 0;
 
   return new Values(primaryColor).tints(100 / (count + 1)).reverse().slice(1);
 });
+console.log(remainingHours);
 const chartCompleteData = computed(() => ({
   labels: [
     ...(performances.value.map(performance => performance.contract.display_label) || []),
@@ -78,7 +90,7 @@ const chartCompleteData = computed(() => ({
     label: "Hours performed",
     data: [
       ...(performances.value.map(performance => performance.duration) || []),
-      contractsData.value?.remaining_hours || 0,
+      remainingHours.value,
     ],
     backgroundColor: [...chartShades.value.map(shade => `#${shade.hex}`), inactiveColor],
     cutout: '80%',
