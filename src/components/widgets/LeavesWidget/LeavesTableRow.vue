@@ -52,7 +52,7 @@ const timeTo = computed(() => {
 </script>
 <template lang="pug">
   div(
-    class="leaves-row selectable"
+    class="leaves-row"
     :class="{'selectable': leave.status === 'pending'}"
     @click="handleLeaveClick()"
   )
