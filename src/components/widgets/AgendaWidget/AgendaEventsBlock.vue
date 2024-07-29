@@ -26,7 +26,7 @@ import {faCalendarCheck, faArrowUp, faMapMarker, faClock, faInfo, faCalendarPlus
             div(class="d-flex flex-row align-items-center mb-1")
               p {{ event.display_label }}
               button(
-                class="btn btn-info-soft rounded-pill btn-sm btn-square text-info d-flex align-items-center ics-button"
+                class="btn btn-info-soft rounded-pill btn-sm btn-square text-info d-flex align-items-center mr-1 ics-button"
                 @click="downloadICSFile(event)"
               )
                 font-awesome-icon(:icon='faCalendarPlus' :style="{'aspect-ratio': '1/1'}" )
@@ -191,6 +191,7 @@ export default {
     & > div {
       & > .ics-button {
         line-height: 1;
+        align-self: flex-start;
 
         &:hover, &:active, &:focus {
           background-color: $info-soft;
@@ -209,8 +210,6 @@ export default {
       }
 
       &:first-child {
-        height: 1.5em;
-
         & > p {
           font-size: 0.875rem;
           color: $gray-900;

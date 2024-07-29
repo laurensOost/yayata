@@ -73,10 +73,19 @@ const timeTo = computed(() => {
 
 .leaves-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(4, 1fr);
   align-items: center;
   padding: 8px 22px;
   border-bottom: 1px solid $gray-400;
+
+  @include media-breakpoint-down(md) {
+    padding: 6px 22px;
+    grid-column-gap: 4px;
+
+    & > .leave-tag {
+      justify-self: flex-end;
+    }
+  }
 
   &.selectable {
     &:hover {
