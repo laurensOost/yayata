@@ -1,5 +1,12 @@
 <script setup>
-import {faCalendarCheck, faArrowUp, faMapMarker, faClock, faInfo, faCalendarPlus} from "@fortawesome/free-solid-svg-icons";
+import {
+  faCalendarCheck,
+  faArrowUp,
+  faMapMarker,
+  faClock,
+  faInfo,
+  faCalendarPlus
+} from "@fortawesome/free-solid-svg-icons";
 </script>
 
 <template lang="pug">
@@ -26,7 +33,8 @@ import {faCalendarCheck, faArrowUp, faMapMarker, faClock, faInfo, faCalendarPlus
             div(class="d-flex flex-row align-items-center mb-1")
               p {{ event.display_label }}
               button(
-                class="btn btn-info-soft rounded-pill btn-sm btn-square text-info d-flex align-items-center mr-1 ics-button"
+                class="btn btn-info-soft rounded-pill btn-sm btn-square text-info d-flex align-items-center ics-button"
+                :class="{ 'mr-1': event.link }"
                 @click="downloadICSFile(event)"
               )
                 font-awesome-icon(:icon='faCalendarPlus' :style="{'aspect-ratio': '1/1'}" )
