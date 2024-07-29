@@ -6,7 +6,7 @@
 
     div(class='row gy-3 mb-3')
       div(class='col-xl-3')
-        div(class='row d-flex flex-column flex-sm-row flex-xl-column gy-3')
+        div(class='row d-flex flex-column flex-sm-row flex-xl-column gy-3 h-100')
           AgendaCalendarBlock
           AgendaEventsBlock
 
