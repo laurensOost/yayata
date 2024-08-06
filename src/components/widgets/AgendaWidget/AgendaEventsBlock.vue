@@ -228,6 +228,7 @@ export default {
         & > p {
           font-size: 0.75rem;
           color: $gray-500;
+          word-break: break-word;
         }
 
         & > svg {
