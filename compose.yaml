@@ -1,0 +1,6 @@
+services:
+
+  yayata:
+    build: .
+    ports:
+      - "8080"
